@@ -1,0 +1,370 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue!60!black, citecolor=blue!60!black]{hyperref}
+
+% ----- Environnements de théorèmes -----
+\theoremstyle{plain}
+\newtheorem{theorem}{Théorème}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemme}
+\newtheorem{corollary}[theorem]{Corollaire}
+\theoremstyle{definition}
+\newtheorem{example}[theorem]{Exemple}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remarque}
+
+% ----- Macros -----
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\ps}{\text{p.s.}}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+
+\title{Convergence des martingales de Doob\\et dichotomie de Kakutani}
+\author{}
+\date{Juillet 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Ce document présente le théorème de convergence presque sûre des martingales de Doob,
+l'inégalité des montées qui en constitue le c\oe ur, puis la dichotomie de Kakutani
+(1948) pour les martingales produit et les mesures produit infinies, avec sa preuve
+complète. On détaille le cas gaussien, sa reformulation comme théorème de
+Cameron--Martin, et les liens avec la statistique asymptotique et la finance
+mathématique.
+\end{abstract}
+
+\tableofcontents
+
+%=======================================================================
+\section{Le théorème de convergence de Doob}
+%=======================================================================
+
+Dans toute la suite, $(\Omega, \F, (\F_n)_{n \ge 0}, \Prob)$ désigne un espace de
+probabilité filtré.
+
+\begin{theorem}[Doob]\label{thm:doob}
+Soit $(X_n)_{n\ge 0}$ une sous-martingale telle que
+\begin{equation}\label{eq:hyp}
+\sup_{n\ge 0} \E\bigl[X_n^+\bigr] < \infty.
+\end{equation}
+Alors il existe une variable aléatoire $X_\infty$ telle que
+\[
+X_n \xrightarrow[n\to\infty]{\ps} X_\infty,
+\qquad \E\bigl[\abs{X_\infty}\bigr] < \infty.
+\]
+\end{theorem}
+
+\begin{remark}
+Pour une sous-martingale, la condition \eqref{eq:hyp} équivaut à la bornitude dans
+$L^1$ : en effet $\E[\abs{X_n}] = 2\,\E[X_n^+] - \E[X_n]$ et la suite
+$(\E[X_n])_n$ est croissante, donc minorée par $\E[X_0]$.
+\end{remark}
+
+\begin{corollary}\label{cor:cas-part}
+Les processus suivants convergent presque sûrement :
+\begin{enumerate}[label=(\roman*)]
+\item toute martingale bornée dans $L^1$ ;
+\item toute sous-martingale majorée par une constante ;
+\item toute surmartingale positive --- sans aucune hypothèse d'intégrabilité
+      supplémentaire, puisque $\E[X_n^+] = \E[X_n] \le \E[X_0]$.
+\end{enumerate}
+\end{corollary}
+
+\subsection{L'inégalité des montées}
+
+Pour $a < b$ réels, on note $U_n[a,b]$ le nombre de \emph{traversées montantes}
+complètes de l'intervalle $[a,b]$ par la trajectoire $(X_0, \dots, X_n)$ :
+le nombre de fois où le processus, parti sous le niveau $a$, atteint le niveau $b$.
+
+\begin{lemma}[Inégalité des montées de Doob]\label{lem:upcrossing}
+Si $(X_n)$ est une sous-martingale, alors pour tous $a<b$ et tout $n \ge 0$,
+\[
+(b-a)\, \E\bigl[U_n[a,b]\bigr]
+\;\le\;
+\E\bigl[(X_n - a)^+\bigr] - \E\bigl[(X_0 - a)^+\bigr].
+\]
+\end{lemma}
+
+\begin{proof}[Preuve du théorème~\ref{thm:doob} à partir du lemme]
+Sous l'hypothèse \eqref{eq:hyp}, le membre de droite est majoré par
+$\sup_n \E[X_n^+] + \abs{a} < \infty$ uniformément en $n$. Par convergence monotone,
+$\E[U_\infty[a,b]] < \infty$, donc $U_\infty[a,b] < \infty$ presque sûrement.
+Or
+\[
+\Bigl\{\liminf_n X_n < \limsup_n X_n\Bigr\}
+= \bigcup_{\substack{a<b \\ a,b \in \Q}} \bigl\{U_\infty[a,b] = \infty\bigr\},
+\]
+union dénombrable d'événements négligeables. Donc $X_n$ converge p.s.\ dans
+$\overline{\R}$ vers une limite $X_\infty$. Le lemme de Fatou donne enfin
+$\E[\abs{X_\infty}] \le \liminf_n \E[\abs{X_n}] < \infty$, ce qui assure en
+particulier $\abs{X_\infty} < \infty$ p.s.
+\end{proof}
+
+\subsection{Convergence $L^1$ et martingales fermées}
+
+La convergence du théorème~\ref{thm:doob} a lieu presque sûrement, mais pas
+nécessairement dans $L^1$.
+
+\begin{proposition}\label{prop:UI}
+Soit $(X_n)$ une martingale. Les assertions suivantes sont équivalentes :
+\begin{enumerate}[label=(\roman*)]
+\item la famille $(X_n)_{n \ge 0}$ est uniformément intégrable ;
+\item $X_n$ converge dans $L^1$ ;
+\item la martingale est \emph{fermée} : il existe $Z \in L^1$ telle que
+      $X_n = \E[Z \mid \F_n]$ pour tout $n$.
+\end{enumerate}
+Dans ce cas $X_n \to X_\infty$ p.s.\ et dans $L^1$, et
+$X_n = \E[X_\infty \mid \F_n]$.
+\end{proposition}
+
+La dichotomie de Kakutani, objet de la section suivante, fournit un critère
+\emph{exact} d'intégrabilité uniforme pour une classe importante de martingales :
+les martingales produit.
+
+%=======================================================================
+\section{La dichotomie de Kakutani}
+%=======================================================================
+
+\subsection{Formulation martingale}
+
+\begin{theorem}[Kakutani, 1948 --- version martingale]\label{thm:kakutani-mart}
+Soit $(\xi_k)_{k \ge 1}$ une suite de variables aléatoires indépendantes, positives,
+d'espérance $\E[\xi_k] = 1$, et soit
+\[
+X_n = \prod_{k=1}^{n} \xi_k, \qquad X_0 = 1,
+\]
+la martingale produit associée. On pose $a_k = \E\bigl[\sqrt{\xi_k}\bigr] \in (0,1]$.
+Alors exactement l'une des deux situations suivantes se produit :
+\begin{enumerate}[label=(\Alph*)]
+\item $\displaystyle\prod_{k\ge 1} a_k > 0$
+      \emph{(de manière équivalente $\sum_k (1-a_k) < \infty$)} :
+      la martingale $(X_n)$ est uniformément intégrable, $X_n \to X_\infty$
+      p.s.\ et dans $L^1$, et $\E[X_\infty] = 1$ ;
+\item $\displaystyle\prod_{k\ge 1} a_k = 0$ :
+      \quad $X_\infty = 0$ presque sûrement.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}
+Noter que $a_k \le 1$ résulte de l'inégalité de Cauchy--Schwarz
+($\E[\sqrt{\xi_k}] \le \sqrt{\E[\xi_k]} = 1$), avec égalité si et seulement si
+$\xi_k = 1$ p.s. Le produit $\prod_k a_k$ mesure donc l'accumulation des
+perturbations : chaque facteur non trivial coûte strictement.
+\end{remark}
+
+\begin{proof}
+Dans les deux cas, $(X_n)$ est une martingale positive, donc converge p.s.\ vers
+une limite $X_\infty \ge 0$ intégrable (corollaire~\ref{cor:cas-part}).
+
+\medskip
+\noindent\emph{Cas (A).} Posons
+\[
+Y_n = \prod_{k=1}^{n} \frac{\sqrt{\xi_k}}{a_k}.
+\]
+Par indépendance, $(Y_n)$ est une martingale positive de moyenne $1$, et
+\[
+\E\bigl[Y_n^2\bigr]
+= \prod_{k=1}^{n} \frac{\E[\xi_k]}{a_k^2}
+= \prod_{k=1}^{n} a_k^{-2}
+\;\le\; \Bigl(\prod_{k\ge 1} a_k\Bigr)^{-2} < \infty.
+\]
+La martingale $(Y_n)$ est donc bornée dans $L^2$ : elle converge dans $L^2$
+(et p.s.) vers une limite $Y_\infty$. Comme
+\[
+X_n = Y_n^2 \prod_{k=1}^{n} a_k^2,
+\]
+et que $Y_n^2 \to Y_\infty^2$ dans $L^1$ (convergence $L^2$ de $Y_n$ plus
+bornitude $L^2$), la suite $(X_n)$ converge dans $L^1$. La
+proposition~\ref{prop:UI} donne l'intégrabilité uniforme et
+$\E[X_\infty] = \lim_n \E[X_n] = 1$ ; en particulier
+$\Prob(X_\infty > 0) > 0$.
+
+\medskip
+\noindent\emph{Cas (B).} Par indépendance,
+\[
+\E\bigl[\sqrt{X_n}\bigr] = \prod_{k=1}^{n} a_k \xrightarrow[n\to\infty]{} 0.
+\]
+Comme $\sqrt{X_n} \to \sqrt{X_\infty}$ p.s., le lemme de Fatou donne
+\[
+\E\bigl[\sqrt{X_\infty}\bigr] \le \liminf_n \E\bigl[\sqrt{X_n}\bigr] = 0,
+\]
+donc $X_\infty = 0$ p.s.
+\end{proof}
+
+\begin{remark}[Tout ou rien]
+Il n'existe aucun régime intermédiaire : $\Prob(X_\infty > 0)$ vaut soit une
+quantité rendant la martingale fermée avec $\E[X_\infty]=1$, soit exactement $0$.
+On peut le relier à une loi du zéro--un : l'événement $\{X_\infty > 0\}$ est,
+modulo un ensemble négligeable, mesurable par rapport à la tribu asymptotique des
+$(\xi_k)$, donc de probabilité $0$ ou $1$ par la loi de Kolmogorov.
+\end{remark}
+
+\subsection{Formulation en théorie de la mesure}
+
+\begin{theorem}[Kakutani --- mesures produit]\label{thm:kakutani-mes}
+Soient $(E_k, \mathcal{E}_k)_{k\ge1}$ des espaces mesurables et, sur chacun, deux
+probabilités équivalentes $P_k \sim Q_k$. On définit sur l'espace produit
+$E = \prod_k E_k$ les mesures
+\[
+P = \bigotimes_{k\ge1} P_k, \qquad Q = \bigotimes_{k\ge1} Q_k,
+\]
+et l'\emph{affinité de Hellinger} de chaque facteur
+\[
+\rho_k = \int_{E_k} \sqrt{\frac{dQ_k}{dP_k}}\; dP_k \;\in\; (0,1].
+\]
+Alors :
+\begin{enumerate}[label=(\Alph*)]
+\item si $\prod_k \rho_k > 0$, alors $Q \sim P$ (mesures équivalentes) ;
+\item si $\prod_k \rho_k = 0$, alors $Q \perp P$ (mesures étrangères).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Lien avec la version martingale]
+Travaillons sous $P$ et posons $\xi_k = \frac{dQ_k}{dP_k}(\omega_k)$, variables
+indépendantes, positives, d'espérance $1$ sous $P$. La martingale produit
+$X_n = \prod_{k \le n} \xi_k$ n'est autre que le processus de densité
+\[
+X_n = \frac{dQ}{dP}\bigg|_{\F_n},
+\qquad \F_n = \sigma(\omega_1, \dots, \omega_n),
+\]
+et $a_k = \E_P[\sqrt{\xi_k}] = \rho_k$. Dans le cas (A), la martingale est fermée
+par $X_\infty$ avec $\E_P[X_\infty]=1$ ; on vérifie alors que
+$dQ = X_\infty\, dP$ avec de plus $X_\infty > 0$ $P$-p.s.\ (appliquer le même
+argument en échangeant les rôles de $P$ et $Q$, licite car
+$\int \sqrt{dP_k/dQ_k}\,dQ_k = \rho_k$ également), d'où $Q \sim P$. Dans le cas
+(B), $X_\infty = 0$ $P$-p.s.\ tandis que, par symétrie, le processus de densité
+inverse tend vers $0$ $Q$-p.s. : les deux mesures se concentrent sur des
+événements disjoints, $Q \perp P$.
+\end{proof}
+
+\begin{remark}
+Le contenu frappant du théorème est l'absence de décomposition de Lebesgue non
+triviale : bien que chaque facteur soit équivalent, une infinité de perturbations
+individuellement bénignes produit soit une équivalence globale, soit une
+singularité totale --- jamais un mélange.
+\end{remark}
+
+%=======================================================================
+\section{Le cas gaussien et le théorème de Cameron--Martin}
+%=======================================================================
+
+\begin{example}[Martingale exponentielle gaussienne]\label{ex:gauss}
+Soient $(Z_k)$ i.i.d.\ $\mathcal{N}(0,1)$, $(\sigma_k)$ une suite réelle, et
+\[
+\xi_k = \exp\Bigl(\sigma_k Z_k - \tfrac{\sigma_k^2}{2}\Bigr),
+\qquad
+X_n = \prod_{k=1}^n \xi_k
+= \exp\Bigl(\sum_{k=1}^n \sigma_k Z_k - \tfrac12 \sum_{k=1}^n \sigma_k^2\Bigr).
+\]
+La transformée de Laplace gaussienne $\E[e^{\lambda Z}] = e^{\lambda^2/2}$ donne
+$\E[\xi_k] = 1$ et
+\[
+a_k = \E\bigl[\sqrt{\xi_k}\bigr]
+= \E\Bigl[e^{\frac{\sigma_k}{2} Z_k - \frac{\sigma_k^2}{4}}\Bigr]
+= e^{\frac{\sigma_k^2}{8} - \frac{\sigma_k^2}{4}}
+= e^{-\sigma_k^2/8}.
+\]
+La dichotomie se lit alors sur une condition de sommabilité :
+\[
+\prod_k a_k > 0
+\iff
+\boxed{\;\sum_{k\ge1} \sigma_k^2 < \infty.\;}
+\]
+\begin{itemize}
+\item Si $\sum_k \sigma_k^2 < \infty$ : $X_n \to X_\infty > 0$ p.s.,
+      $\E[X_\infty]=1$, la martingale est fermée.
+\item Si $\sum_k \sigma_k^2 = \infty$ (en particulier à $\sigma_k = \sigma > 0$
+      constant) : $X_\infty = 0$ p.s., alors que $\E[X_n] = 1$ pour tout $n$.
+      À $\sigma$ constant, la loi des grands nombres précise la vitesse :
+      $\frac1n \log X_n \to -\sigma^2/2$ p.s.
+\end{itemize}
+\end{example}
+
+\begin{corollary}[Cameron--Martin, cas discret]
+Sur $\R^{\N}$ muni des tribus produit,
+\[
+\bigotimes_{k\ge1} \mathcal{N}(\theta_k, 1) \;\sim\; \bigotimes_{k\ge1} \mathcal{N}(0,1)
+\iff
+(\theta_k)_k \in \ell^2,
+\]
+et il y a singularité totale sinon.
+\end{corollary}
+
+\begin{proof}
+La densité du facteur $k$ est
+$\frac{d\mathcal{N}(\theta_k,1)}{d\mathcal{N}(0,1)}(x) = e^{\theta_k x - \theta_k^2/2}$,
+soit exactement $\xi_k$ de l'exemple~\ref{ex:gauss} avec $\sigma_k = \theta_k$.
+La condition $\sum \theta_k^2 < \infty$ conclut par le
+théorème~\ref{thm:kakutani-mes}.
+\end{proof}
+
+\begin{remark}
+C'est la version discrète du théorème de Cameron--Martin pour la mesure de
+Wiener : une translation du brownien par une fonction $h$ produit une mesure
+équivalente si et seulement si $h$ appartient à l'espace de Cameron--Martin
+(dérivée dans $L^2$), et une mesure étrangère sinon --- même mécanisme, même
+dichotomie.
+\end{remark}
+
+%=======================================================================
+\section{Portée du résultat}
+%=======================================================================
+
+\paragraph{Statistique asymptotique.}
+Soit à tester $H_0 : \text{les observations suivent } P$ contre
+$H_1 : \text{elles suivent } Q$, à partir de la suite infinie d'observations
+indépendantes. La dichotomie affirme que la discrimination parfaite est soit
+possible (cas singulier : le test $\{X_\infty = 0\}$ ne commet asymptotiquement
+aucune erreur), soit impossible même asymptotiquement (cas équivalent : aucun test
+consistant n'existe, les deux hypothèses restent \emph{contiguës}). L'affinité de
+Hellinger $\rho_k$, et la distance de Hellinger associée
+$H^2(P_k, Q_k) = 2(1 - \rho_k)$, sont ainsi les quantités naturelles de la théorie
+de la contiguïté de Le~Cam : la frontière $\sum_k H^2(P_k, Q_k) < \infty$ sépare
+exactement le détectable de l'indétectable.
+
+\paragraph{Finance mathématique.}
+Le processus de densité d'un changement de mesure de Girsanov,
+$X_t = \exp\bigl(\int_0^t \theta_s\, dW_s - \frac12 \int_0^t \theta_s^2\, ds\bigr)$,
+est une martingale exponentielle du type de l'exemple~\ref{ex:gauss}. Sur horizon
+fini, la condition de Novikov
+$\E\bigl[e^{\frac12\int_0^T \theta_s^2 ds}\bigr] < \infty$ garantit qu'elle est une
+vraie martingale fermée et que la mesure risque-neutre existe. Sur horizon infini,
+c'est le mécanisme de Kakutani qui gouverne : si la \og prime de risque \fg{}
+cumulée $\int_0^\infty \theta_s^2\, ds$ diverge, le changement de mesure dégénère
+($X_\infty = 0$), et les mesures historique et risque-neutre deviennent étrangères
+--- même mathématique que le cas discret, avec $\sum \sigma_k^2$ remplacée par
+l'intégrale.
+
+\paragraph{En résumé.}
+Le théorème de Doob garantit l'existence de la limite ; la dichotomie de Kakutani
+répond à la question que Doob laisse ouverte --- \emph{la limite conserve-t-elle la
+masse ?} --- et y répond de la manière la plus tranchée possible : tout ou rien,
+avec un critère exact, calculable facteur par facteur.
+
+\begin{thebibliography}{9}
+\bibitem{kakutani} S.~Kakutani, \emph{On equivalence of infinite product measures},
+Annals of Mathematics \textbf{49} (1948), 214--224.
+\bibitem{williams} D.~Williams, \emph{Probability with Martingales},
+Cambridge University Press, 1991.
+\bibitem{durrett} R.~Durrett, \emph{Probability: Theory and Examples},
+5\textsuperscript{e} éd., Cambridge University Press, 2019.
+\bibitem{lecam} L.~Le~Cam, \emph{Asymptotic Methods in Statistical Decision Theory},
+Springer, 1986.
+\end{thebibliography}
+
+\end{document}

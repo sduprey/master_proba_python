@@ -1,0 +1,56 @@
+> with(LinearAlgebra);
+> with(Statistics);
+> with(plots);
+> P := Matrix(3, 3, [6*(1/10), 2*(1/10), 2*(1/10), 15*(1/100), 7/10, 15*(1/100), 5*(1/100), 5*(1/100), 9/10]);
+> mu0 := Vector[row]([1/2, 3/10, 2*(1/10)]);
+> loi1 := RandomVariable(ProbabilityTable(convert(mu0, list)));
+> X := Array(1 .. 60); X[1] := Sample(loi1, 1)[1];
+> unassign('i'); for j from 2 to 60 do loi := RandomVariable(ProbabilityTable(convert(Row(P, X[j-1]), list))); X[j] := Sample(loi, 1)[1] end do;
+> plot([seq([j, X[j]], j = 1 .. 60)], style = point);
+> V1, V2 := Eigenvectors(Transpose(P));
+> V2;
+> muinv := Column(V2, 1);
+> 1/4+1/3+1;
+> muinv := (12/19)*muinv;
+> i1 := 0; for j to 60 do if X[j] = 1 then i1 := i1+1 end if end do;
+> i1;
+> evalf(10*(1/60)); evalf(3/19);
+> U := Array(1 .. 60); V := Array(1 .. 60); W := Array(1 .. 60);
+> A := copy(mu0); for j to 60 do A := evalf(A.P); U[j] := A[1]; V[j] := A[2]; W[j] := A[3] end do;
+> plotu := plot([seq([j, U[j]], j = 1 .. 60)]);
+> plotv := plot([seq([j, V[j]], j = 1 .. 60)]);
+> plotw := plot([seq([j, W[j]], j = 1 .. 60)]);
+> display(plotu, plotv, plotw);
+> norme := Array(1 .. 60);
+> muinv := Transpose(muinv);
+> A := copy(mu0); for j to 60 do A := evalf(A.P); norme[j] := Norm(A-muinv, 1) end do;
+> print(norme);
+> norme[1];
+> norme[2];
+> logplot([seq([j, norme[j]], j = 1 .. 60)]);
+> ExponentialFit([seq(i, i = 1 .. 60)], norme);
+> 
+> EhrenFest := proc (n, k0) X := Array(1 .. n); X[1] := k0; Uni := RandomVariable(DiscreteUniform(1, 10)); for i to n-1 do S := Sample(Uni, 1)[1]; if X[i] < S then X[i+1] := X[i]+1 else X[i+1] := X[i]-1 end if end do; return X end proc;
+> Xurne := EhrenFest(1000, 10);
+> Xurne[1000];
+> H1 := Histogram(Xurne, discrete = true, frequencyscale = relative, style = point);
+> H2 := DensityPlot(Binomial(10, 1/2), color = red, style = point);
+> display(H1, H2);
+> Pehr := Matrix(11, 11);
+> for i from 2 to 11 do Pehr[i, i-1] := (i-1)*(1/10) end do;
+> for j to 10 do Pehr[j, j+1] := (11-j)*(1/10) end do;
+> muinv := Vector[row](11); for j to 11 do muinv[j] := binomial(10, j-1)/2^10 end do;
+> mu[0] := Vector[row]([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]); norme := Array(1 .. 1000); norme2 := Array(1 .. 1000); A := copy(mu[0]); B := copy(A); for j to 1000 do A := evalf(A.Pehr); B := evalf(B+A); norme[j] := Norm(A-muinv, 1); norme2[j] := Norm(B/j-muinv, 1) end do;
+> 
+> 
+> A[4];
+> P1 := plot([seq([i, norme[i]], i = 1 .. 1000)]);
+> P2 := plot([seq([i, norme2[i]], i = 1 .. 1000)], color = blue);
+> display(P1, P2);
+> loglogplot([seq([i, norme2[i]], i = 1 .. 1000)], color = blue);
+> PowerFit([seq(i, i = 1 .. 1000)], norme2);
+> Tret := proc (l) X := l; Uni := RandomVariable(DiscreteUniform(1, 10)); S := Sample(Uni, 1)[1]; if X < S then X := X+1 else X := X-1 end if; temps := 1; while X <> l do S := Sample(Uni, 1)[1]; if X < S then X := X+1 else X := X-1 end if; temps := temps+1 end do; return temps end proc;
+> Tret(3);
+> for j to 500 do tem[j] := Tret(3) end do; Tmean := Mean(convert(tem, list));
+> evalf(1/muinv(4));
+> 

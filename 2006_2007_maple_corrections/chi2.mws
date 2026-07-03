@@ -1,0 +1,239 @@
+{VERSION 5 0 "IBM INTEL LINUX" "5.0" }
+{USTYLETAB {CSTYLE "Maple Input" -1 0 "Courier" 0 1 255 0 0 1 0 1 0 0 
+1 0 0 0 0 1 }{CSTYLE "2D Math" -1 2 "Times" 0 1 0 0 0 0 0 0 2 0 0 0 0 
+0 0 1 }{CSTYLE "2D Output" 2 20 "" 0 1 0 0 255 1 0 0 0 0 0 0 0 0 0 1 }
+{PSTYLE "Normal" -1 0 1 {CSTYLE "" -1 -1 "" 0 1 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 }0 0 0 -1 -1 -1 0 0 0 0 0 0 -1 0 }{PSTYLE "Text Output" -1 2 1 
+{CSTYLE "" -1 -1 "Courier" 1 10 0 0 255 1 0 0 0 0 0 1 3 0 3 0 }1 0 0 
+-1 -1 -1 0 0 0 0 0 0 -1 0 }{PSTYLE "Warning" 2 7 1 {CSTYLE "" -1 -1 "
+" 0 1 0 0 255 1 0 0 0 0 0 0 1 0 0 0 }0 0 0 -1 -1 -1 0 0 0 0 0 0 -1 0 }
+{PSTYLE "Maple Output" 0 11 1 {CSTYLE "" -1 -1 "" 0 1 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 }3 3 0 -1 -1 -1 0 0 0 0 0 0 -1 0 }{PSTYLE "" 11 12 1 
+{CSTYLE "" -1 -1 "" 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }1 0 0 -1 -1 -1 0 
+0 0 0 0 0 -1 0 }{PSTYLE "Maple Plot" 0 13 1 {CSTYLE "" -1 -1 "" 0 1 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 }3 0 0 -1 -1 -1 0 0 0 0 0 0 -1 0 }}
+{SECT 0 {EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 12 "with(stats):" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 16 "with(statplots):" }}}{EXCHG 
+{PARA 0 "> " 0 "" {MPLTEXT 1 0 12 "with(plots):" }}{PARA 7 "" 1 "" 
+{TEXT -1 50 "Warning, the name changecoords has been redefined\n" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 42 "Fil:=[2,12.5,4,4,2,5.5,10,17
+.5,11,12.5,2];" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%$FilG7-\"\"#$\"$D
+\"!\"\"\"\"%F*F&$\"#bF)\"#5$\"$v\"F)\"#6F'F&" }}}{EXCHG {PARA 0 "> " 
+0 "" {MPLTEXT 1 0 44 "Gar:=[7,6,6,8,9,10,9,11,16.5,14,12,4,11,2];\n" }
+}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%$GarG70\"\"(\"\"'F'\"\")\"\"*\"#5F)
+\"#6$\"$l\"!\"\"\"#9\"#7\"\"%F+\"\"#" }}}{EXCHG {PARA 0 "> " 0 "" 
+{MPLTEXT 1 0 14 "nf:=nops(Fil);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%#
+nfG\"#6" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 14 "ng:=nops(Gar);" 
+}}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%#ngG\"#9" }}}{EXCHG {PARA 0 "> " 
+0 "" {MPLTEXT 1 0 25 "muf:=describe[mean](Fil);" }}{PARA 11 "" 1 "" 
+{XPPMATH 20 "6#>%$mufG$\"+XXXXv!\"*" }}}{EXCHG {PARA 0 "> " 0 "" 
+{MPLTEXT 1 0 25 "mug:=describe[mean](Gar);" }}{PARA 11 "" 1 "" 
+{XPPMATH 20 "6#>%$mugG$\"+9dGk*)!\"*" }}}{EXCHG {PARA 0 "> " 0 "" 
+{MPLTEXT 1 0 40 "sf:=describe[standarddeviation[1]](Fil);" }}{PARA 11 
+"" 1 "" {XPPMATH 20 "6#>%#sfG$\"+e:-k`!\"*" }}}{EXCHG {PARA 0 "> " 0 "
+" {MPLTEXT 1 0 41 "sg:=describe[standarddeviation[1]](Gar);\n" }}
+{PARA 11 "" 1 "" {XPPMATH 20 "6#>%#sgG$\"+_,?&)Q!\"*" }}}{EXCHG {PARA 
+0 "> " 0 "" {MPLTEXT 1 0 36 "st:=((nf-1)*sf+(ng-1)*sg)/(nf+ng-2);" }}
+{PARA 11 "" 1 "" {XPPMATH 20 "6#>%#stG$\"+$)f;GX!\"*" }}}{EXCHG {PARA 
+0 "> " 0 "" {MPLTEXT 1 0 47 "Ecart:=evalf(sqrt(nf*ng/(nf+ng))*(mug-muf
+)/st);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%&EcartG$\"+i2wwx!#5" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 45 "statevalf[icdf,studentst[nf+
+ng-2]](1-0.45/2);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#$\"+%fl^o(!#5" }}
+}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}}{EXCHG {PARA 0 "> " 0 "
+" {MPLTEXT 1 0 195 "ajust:=proc(Obs,Nu,n,alpha);\nN:=add(Obs[i],i=1..n
+);\nD:=add((N*Nu[i]-Obs[i])^2/(N*Nu[i]),i=1..n);\nchialpha:=statevalf[
+icdf,chisquare[n-1]](1-alpha);\nif D>chialpha then 1; else 0; end if;
+\nend proc;" }}{PARA 7 "" 1 "" {TEXT -1 63 "Warning, `N` is implicitly
+ declared local to procedure `ajust`\n" }}{PARA 7 "" 1 "" {TEXT -1 63 
+"Warning, `D` is implicitly declared local to procedure `ajust`\n" }}
+{PARA 7 "" 1 "" {TEXT -1 70 "Warning, `chialpha` is implicitly declare
+d local to procedure `ajust`\n" }}{PARA 12 "" 1 "" {XPPMATH 20 "6#>%&a
+justGf*6&%$ObsG%#NuG%\"nG%&alphaG6%%\"NG%\"DG%)chialphaG6\"F/C&>8$-%$a
+ddG6$&9$6#%\"iG/F9;\"\"\"9&>8%-F46$*(,&*&F2F<&9%F8F<F<F6!\"\"\"\"#F2FG
+FEFGF:>8&-&%*statevalfG6$%%icdfG&%*chisquareG6#,&F=F<F<FG6#,&F<F<9'FG@
+%2FJF?F<\"\"!F/F/F/" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 40 "T:=[
+120,87,115,103,91,109,92,112,94,77];" }}{PARA 11 "" 1 "" {XPPMATH 20 "
+6#>%\"TG7,\"$?\"\"#()\"$:\"\"$.\"\"#\"*\"$4\"\"##*\"$7\"\"#%*\"#x" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 25 "Nu0:=[seq(1/10,i=1..10)];" }
+}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%$Nu0G7,#\"\"\"\"#5F&F&F&F&F&F&F&F&F
+&" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 21 "ajust(T,Nu0,10,0.04);
+" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"!" }}}{EXCHG {PARA 0 "> " 0 "
+" {MPLTEXT 1 0 42 "Ech:=[random[discreteuniform[0,9]](1000)]:" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 7 "Ech[1];" }}{PARA 11 "" 1 "" 
+{XPPMATH 20 "6#\"\"%" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 28 "Ech
+2:=transform[tally](Ech);" }}{PARA 12 "" 1 "" {XPPMATH 20 "6#>%%Ech2G7
+,-%'WeightG6$\"\"!\"$.\"-F'6$\"\"\"\"#))-F'6$\"\"#\"##*-F'6$\"\"$\"#%*
+-F'6$\"\"%\"$2\"-F'6$\"\"&F2-F'6$\"\"'\"$F\"-F'6$\"\"(F*-F'6$\"\")\"#*
+*-F'6$\"\"*\"#&*" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 8 "Ech2[1];
+" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#-%'WeightG6$\"\"!\"$.\"" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 11 "Ech2[1][1];" }}{PARA 11 "" 
+1 "" {XPPMATH 20 "6#&-%'WeightG6$\"\"!\"$.\"6#\"\"\"" }}}{EXCHG {PARA 
+0 "> " 0 "" {MPLTEXT 1 0 33 "Ech3:=transform[frequency](Ech2);" }}
+{PARA 11 "" 1 "" {XPPMATH 20 "6#>%%Ech3G7,\"$.\"\"#))\"##*\"#%*\"$2\"F
+(\"$F\"F&\"#**\"#&*" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 23 "ajus
+t(Ech3,Nu0,10,0.2);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"!" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 11 "nops(Ech3);" }}{PARA 11 "" 
+1 "" {XPPMATH 20 "6#\"#5" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 28 
+"G:=[572,2329,3758,2632,709];" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%\"G
+G7'\"$s&\"%HB\"%eP\"%KE\"$4(" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 
+0 32 "vu0:=[1/16,4/16,6/16,4/16,1/16];" }}{PARA 11 "" 1 "" {XPPMATH 
+20 "6#>%$vu0G7'#\"\"\"\"#;#F'\"\"%#\"\"$\"\")F)F&" }}}{EXCHG {PARA 0 "
+> " 0 "" {MPLTEXT 1 0 24 "ajust(G,vu0,5,0.000001);" }}{PARA 11 "" 1 "
+" {XPPMATH 20 "6#\"\"\"" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 196 
+"ajust2:=proc(Obs,Nu,n,alpha);\nN:=add(Obs[i],i=1..n);\nD:=add((N*Nu[i
+]-Obs[i])^2/(N*Nu[i]),i=1..n);\nchialpha:=statevalf[icdf,chisquare[n-2
+]](1-alpha);\nif D>chialpha then 1; else 0; end if;\nend proc;" }}
+{PARA 7 "" 1 "" {TEXT -1 64 "Warning, `N` is implicitly declared local
+ to procedure `ajust2`\n" }}{PARA 7 "" 1 "" {TEXT -1 64 "Warning, `D` \+
+is implicitly declared local to procedure `ajust2`\n" }}{PARA 7 "" 1 "
+" {TEXT -1 71 "Warning, `chialpha` is implicitly declared local to pro
+cedure `ajust2`\n" }}{PARA 12 "" 1 "" {XPPMATH 20 "6#>%'ajust2Gf*6&%$O
+bsG%#NuG%\"nG%&alphaG6%%\"NG%\"DG%)chialphaG6\"F/C&>8$-%$addG6$&9$6#%
+\"iG/F9;\"\"\"9&>8%-F46$*(,&*&F2F<&9%F8F<F<F6!\"\"\"\"#F2FGFEFGF:>8&-&
+%*statevalfG6$%%icdfG&%*chisquareG6#,&F=F<FHFG6#,&F<F<9'FG@%2FJF?F<\"
+\"!F/F/F/" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 39 "phat:=(2329+2*
+3758+3*2632+4*709)/40000;" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%%phatG#
+\"&x0#\"&++%" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 85 "nu1:=[(1-ph
+at)^4,phat*(1-phat)^3*4, phat^2*(1-phat)^2*6, phat^3*(1-phat)*4, phat^
+4]; " }}{PARA 12 "" 1 "" {XPPMATH 20 "6#>%$nu1G7'#\"3T!z!RCx>B9\"4++++
+++++c##\"3f4gfJdv2:\"3++++++++k#\"3Br:DHI,#z%\"4++++++++G\"#\"3f4'p:0U
+Ap\"F+#\"3T!fVW3&y#z\"F(" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 19 
+"add(vu0[i],i=1..5);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"\"" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 20 "ajust2(G,nu1,5,0.8);" }}
+{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"!" }}}{EXCHG {PARA 0 "> " 0 "" 
+{MPLTEXT 1 0 5 "i:=0;" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%\"iG\"\"!" 
+}}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 27 "vu0:=[0.25,0.25,0.25,0.25
+];" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%$vu0G7&$\"#D!\"#F&F&F&" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 246 "ping:=proc(eps) \ns:=0;\nfo
+r j from 1 to 100 do\nEch:=[random[empirical[0.25,0.25,0.25-eps,0.25+e
+ps]](100)]:\nEch2:=transform[tally](Ech):\nEch3:=transform[frequency](
+Ech2):\nif (ajust(Ech3,vu0,4,0.05)=1) then s:=s+1: end if;\nend do;\n1
+-s/100;\nend proc;" }}{PARA 0 "" 0 "" {TEXT -1 0 "" }}{PARA 0 "> " 0 "
+" {MPLTEXT 1 0 0 "" }}{PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}{PARA 7 "
+" 1 "" {TEXT -1 69 "`Warning, \\`s\\` is implicitly declared local to \+
+procedure \\`ping\\`\\n`" }}{PARA 7 "" 1 "" {TEXT -1 69 "`Warning, \\`
+j\\` is implicitly declared local to procedure \\`ping\\`\\n`" }}
+{PARA 7 "" 1 "" {TEXT -1 71 "`Warning, \\`Ech\\` is implicitly declare
+d local to procedure \\`ping\\`\\n`" }}{PARA 7 "" 1 "" {TEXT -1 72 "`W
+arning, \\`Ech2\\` is implicitly declared local to procedure \\`ping\\
+`\\n`" }}{PARA 7 "" 1 "" {TEXT -1 72 "`Warning, \\`Ech3\\` is implicit
+ly declared local to procedure \\`ping\\`\\n`" }}{PARA 12 "" 1 "" 
+{XPPMATH 20 "6#>%%pingGf*6#%$epsG6'%\"sG%\"jG%$EchG%%Ech2G%%Ech3G6\"F.
+C%>8$\"\"!?(8%\"\"\"F5\"$+\"%%trueGC&>8&7#-&%'randomG6#&%*empiricalG6&
+$\"#D!\"#FC,&FCF59$!\"\",&FCF5FGF56#F6>8'-&%*transformG6#%&tallyG6#F:>
+8(-&FO6#%*frequencyG6#FL@$/-%&ajustG6&FT%$vu0G\"\"%$\"\"&FEF5>F1,&F1F5
+F5F5,&F5F5*&#F5F6F5F1F5FHF.F.F." }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 
+1 0 11 "ping(0.05);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6##\"#r\"$+\"" }}
+}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 24 "evalf(sqrt(%*(1-%))/10);" }
+}{PARA 11 "" 1 "" {XPPMATH 20 "6#$\"+9D8'[%!#7" }}}{EXCHG {PARA 0 "> \+
+" 0 "" {MPLTEXT 1 0 11 "ping(0.01);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6
+#\"\"&" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}}{EXCHG {PARA 
+0 "> " 0 "" {MPLTEXT 1 0 45 "plot([seq([n/80,1-ping(n/80)/100],n=1..10
+)]);" }}{PARA 13 "" 1 "" {GLPLOT2D 400 300 300 {PLOTDATA 2 "6%-%'CURVE
+SG6$7,7$$\"32++++++]7!#>$\"3c*************\\*!#=7$$\"37+++++++DF*$\"3[
++++++++$*F-7$$\"3')************\\PF*$\"3y*************\\)F-7$$\"3G++++
++++]F*$\"3_*************>)F-7$$\"3+++++++]iF*$\"3%)*************H(F-7$
+$\"3s*************\\(F*$\"3a+++++++cF-7$$\"3X************\\()F*$\"3E++
++++++`F-7$$\"3/+++++++5F-$\"3C+++++++SF-7$$\"3.++++++D6F-$\"33+++++++E
+F-7$$\"3+++++++]7F-$\"39+++++++9F--%'COLOURG6&%$RGBG$\"#5!\"\"$\"\"!F]
+oF\\o-%+AXESLABELSG6$Q!6\"Fao-%%VIEWG6$%(DEFAULTGFfo" 1 2 0 1 10 0 2 
+9 1 4 2 1.000000 45.000000 45.000000 0 0 "Curve 1" }}}}{EXCHG {PARA 0 
+"> " 0 "" {MPLTEXT 1 0 351 "homog:=proc(Ech1,Ech2,n,alpha);\nN1:=add(E
+ch1[i],i=1..n);\nN2:=add(Ech2[i],i=1..n);\nfor i from 1 to n do mu[i]:
+=(Ech1[i]+Ech2[i])/(N1+N2); end do;\nD1:=add((N1*mu[i]-Ech1[i])^2/(N1*
+mu[i]),i=1..n);\nD2:=add((N2*mu[i]-Ech2[i])^2/(N2*mu[i]),i=1..n);\nD:=
+D1+D2;\nchialpha:=statevalf[icdf,chisquare[n-1]](1-alpha);\nif D>chial
+pha then 1; else 0; end if;\nend proc;" }}{PARA 7 "" 1 "" {TEXT -1 64 
+"Warning, `N1` is implicitly declared local to procedure `homog`\n" }}
+{PARA 7 "" 1 "" {TEXT -1 64 "Warning, `N2` is implicitly declared loca
+l to procedure `homog`\n" }}{PARA 7 "" 1 "" {TEXT -1 63 "Warning, `i` \+
+is implicitly declared local to procedure `homog`\n" }}{PARA 7 "" 1 "
+" {TEXT -1 64 "Warning, `mu` is implicitly declared local to procedure
+ `homog`\n" }}{PARA 7 "" 1 "" {TEXT -1 64 "Warning, `D1` is implicitly
+ declared local to procedure `homog`\n" }}{PARA 7 "" 1 "" {TEXT -1 64 
+"Warning, `D2` is implicitly declared local to procedure `homog`\n" }}
+{PARA 7 "" 1 "" {TEXT -1 63 "Warning, `D` is implicitly declared local
+ to procedure `homog`\n" }}{PARA 7 "" 1 "" {TEXT -1 70 "Warning, `chia
+lpha` is implicitly declared local to procedure `homog`\n" }}{PARA 12 
+"" 1 "" {XPPMATH 20 "6#>%&homogGf*6&%%Ech1G%%Ech2G%\"nG%&alphaG6*%#N1G
+%#N2G%\"iG%#muG%#D1G%#D2G%\"DG%)chialphaG6\"F4C*>8$-%$addG6$&9$6#8&/F>
+;\"\"\"9&>8%-F96$&9%F=F??(F>FAFAFB%%trueG>&8'F=*&,&F;FAFGFAFA,&F7FAFDF
+A!\"\">8(-F96$*(,&*&F7FAFLFAFAF;FQ\"\"#F7FQFLFQF?>8)-F96$*(,&*&FDFAFLF
+AFAFGFQFYFDFQFLFQF?>8*,&FSFAFenFA>8+-&%*statevalfG6$%%icdfG&%*chisquar
+eG6#,&FBFAFAFQ6#,&FAFA9'FQ@%2F_oF\\oFA\"\"!F4F4F4" }}}{EXCHG {PARA 0 "
+> " 0 "" {MPLTEXT 1 0 39 "E1:=random[discreteuniform[1,6]](1000):" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 40 "E2:=random[discreteuniform[1
+,6]](10000):" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 28 "E1b:=transf
+orm[tally]([E1]);" }}{PARA 12 "" 1 "" {XPPMATH 20 "6#>%$E1bG7(-%'Weigh
+tG6$\"\"\"\"$u\"-F'6$\"\"#\"$r\"-F'6$\"\"$\"$]\"-F'6$\"\"%F*-F'6$\"\"&
+\"$p\"-F'6$\"\"'\"$i\"" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 28 "E
+2b:=transform[tally]([E2]);" }}{PARA 12 "" 1 "" {XPPMATH 20 "6#>%$E2bG
+7(-%'WeightG6$\"\"\"\"%x;-F'6$\"\"#\"%m;-F'6$\"\"$\"%&o\"-F'6$\"\"%\"%
+U;-F'6$\"\"&\"%'p\"-F'6$\"\"'\"%M;" }}}{EXCHG {PARA 0 "> " 0 "" 
+{MPLTEXT 1 0 31 "E1c:=transform[frequency](E1b);" }}{PARA 11 "" 1 "" 
+{XPPMATH 20 "6#>%$E1cG7(\"$u\"\"$r\"\"$]\"F&\"$p\"\"$i\"" }}}{EXCHG 
+{PARA 0 "> " 0 "" {MPLTEXT 1 0 31 "E2c:=transform[frequency](E2b);" }}
+{PARA 11 "" 1 "" {XPPMATH 20 "6#>%$E2cG7(\"%x;\"%m;\"%&o\"\"%U;\"%'p\"
+\"%M;" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 22 "homog(E1c,E2c,6,0.
+73);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"!" }}}{EXCHG {PARA 0 "> " 
+0 "" {MPLTEXT 1 0 59 "F1:=[random[empirical[0.15,0.15,0.2,0.15,0.2,0.1
+5]](1000)]:" }}}{EXCHG {PARA 11 "" 1 "" {TEXT -1 0 "" }}}{EXCHG {PARA 
+0 "> " 0 "" {MPLTEXT 1 0 26 "F1b:=transform[tally](F1);" }}{PARA 12 "
+" 1 "" {XPPMATH 20 "6#>%$F1bG7(-%'WeightG6$\"\"\"\"$N\"-F'6$\"\"#\"$b
+\"-F'6$\"\"$\"$'=-F'6$\"\"%F.-F'6$\"\"&\"$1#-F'6$\"\"'\"$j\"" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 31 "F1c:=transform[frequency](F1
+b);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%$F1cG7(\"$N\"\"$b\"\"$'=F'\"$
+1#\"$j\"" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 22 "homog(E1c,F1c,6
+,0.05);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"\"" }}}{EXCHG {PARA 0 "
+> " 0 "" {MPLTEXT 1 0 408 "indep:=proc(A,k,l,alpha);\nfor i from 1 to \+
+k do nx[i]:=add(A[i][j],j=1..l); end do;\nfor j from 1 to l do ny[j]:=
+add(A[i][j],i=1..k); end do;\nn:=add(nx[i],i=1..k);\nfor i from 1 to k
+ do\nfor j from 1 to l do\nd[i][j]:=nx[i]*ny[j]/n; end do; end do;\nD:
+=add((add((d[i][j]-A[i][j])^2/d[i][j],i=1..l)),j=1..k);\nchialpha:=sta
+tevalf[icdf,chisquare[(k-1)*(l-1)]](1-alpha);\nif D>chialpha then 1; e
+lse 0; end if;\nend proc;" }}{PARA 7 "" 1 "" {TEXT -1 70 "`Warning, \\
+`i\\` is implicitly declared local to procedure \\`indep\\`\\n`" }}
+{PARA 7 "" 1 "" {TEXT -1 71 "`Warning, \\`nx\\` is implicitly declared
+ local to procedure \\`indep\\`\\n`" }}{PARA 7 "" 1 "" {TEXT -1 70 "`W
+arning, \\`j\\` is implicitly declared local to procedure \\`indep\\`
+\\n`" }}{PARA 7 "" 1 "" {TEXT -1 71 "`Warning, \\`ny\\` is implicitly \+
+declared local to procedure \\`indep\\`\\n`" }}{PARA 7 "" 1 "" {TEXT 
+-1 70 "`Warning, \\`n\\` is implicitly declared local to procedure \\`
+indep\\`\\n`" }}{PARA 7 "" 1 "" {TEXT -1 70 "`Warning, \\`d\\` is impl
+icitly declared local to procedure \\`indep\\`\\n`" }}{PARA 7 "" 1 "" 
+{TEXT -1 70 "`Warning, \\`D\\` is implicitly declared local to procedu
+re \\`indep\\`\\n`" }}{PARA 7 "" 1 "" {TEXT -1 77 "`Warning, \\`chialp
+ha\\` is implicitly declared local to procedure \\`indep\\`\\n`" }}
+{PARA 12 "" 1 "" {XPPMATH 20 "6#>%&indepGf*6&%\"AG%\"kG%\"lG%&alphaG6*
+%\"iG%#nxG%\"jG%#nyG%\"nG%\"dG%\"DG%)chialphaG6\"F4C)?(8$\"\"\"F89%%%t
+rueG>&8%6#F7-%$addG6$&&9$F>6#8&/FF;F89&?(FFF8F8FIF:>&8'FE-F@6$FB/F7;F8
+F9>8(-F@6$F<FP?(F7F8F8F9F:?(FFF8F8FIF:>&&8)F>FE*(F<F8FLF8FS!\"\">8*-F@
+6$-F@6$*&,&FYF8FBFgn\"\"#FYFgn/F7FH/FFFQ>8+-&%*statevalfG6$%%icdfG&%*c
+hisquareG6#*&,&F9F8F8FgnF8,&FIF8F8FgnF86#,&F8F89'Fgn@%2FdoFinF8\"\"!F4
+F4F4" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 68 "A:=[[3,4,2,0,0],[6,
+10,8,2,0],[1,8,20,12,3],[0,0,8,7,3],[0,0,1,0,2]];" }}{PARA 11 "" 1 "" 
+{XPPMATH 20 "6#>%\"AG7'7'\"\"$\"\"%\"\"#\"\"!F*7'\"\"'\"#5\"\")F)F*7'
+\"\"\"F.\"#?\"#7F'7'F*F*F.\"\"(F'7'F*F*F0F*F)" }}}{EXCHG {PARA 0 "> " 
+0 "" {MPLTEXT 1 0 8 "A[1][2];" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"#
+" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 22 "indep(A,5,5,0.000001);
+" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"!" }}}{EXCHG {PARA 0 "> " 0 "
+" {MPLTEXT 1 0 76 "B:=[[1520,266,124,66],[234,1512,432,78],[117,362,17
+72,205],[36,82,179,492]];" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>%\"BG7&7
+&\"%?:\"$m#\"$C\"\"#m7&\"$M#\"%7:\"$K%\"#y7&\"$<\"\"$i$\"%s<\"$0#7&\"#
+O\"##)\"$z\"\"$#\\" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 23 "indep
+(B,4,4,0.0000001);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"\"" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 56 "for i from 1 to 4 do Dr[i]:=
+add(B[i][j],j=1..4); end do;" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>&%#Dr
+G6#\"\"\"\"%w>" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>&%#DrG6#\"\"#\"%cA
+" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>&%#DrG6#\"\"$\"%cC" }}{PARA 11 "
+" 1 "" {XPPMATH 20 "6#>&%#DrG6#\"\"%\"$*y" }}}{EXCHG {PARA 0 "> " 0 "
+" {MPLTEXT 1 0 56 "for j from 1 to 4 do Ga[j]:=add(B[i][j],i=1..4); en
+d do;" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#>&%#GaG6#\"\"\"\"%2>" }}
+{PARA 11 "" 1 "" {XPPMATH 20 "6#>&%#GaG6#\"\"#\"%AA" }}{PARA 11 "" 1 "
+" {XPPMATH 20 "6#>&%#GaG6#\"\"$\"%2D" }}{PARA 11 "" 1 "" {XPPMATH 20 "
+6#>&%#GaG6#\"\"%\"$T)" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 20 "ho
+mog(Ga,Dr,4,0.24);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\"!" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 34 "add((add(A[i][j],i=1..2)),j=
+1..2);" }}{PARA 11 "" 1 "" {XPPMATH 20 "6#\"\")" }}}{EXCHG {PARA 0 "> \+
+" 0 "" {MPLTEXT 1 0 0 "" }}}}{MARK "14 0 0" 0 }{VIEWOPTS 1 1 0 1 1 
+1803 1 1 1 1 }{PAGENUMBERS 0 1 2 33 1 1 }

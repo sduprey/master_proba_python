@@ -1,0 +1,43 @@
+
+> with(Statistics);
+> with(plots);
+> 
+> X := RandomVariable(Normal(0, 1));
+> t := Quantile(X, .375);
+> S := Sample(X, 100);
+> S[1];
+> op(1, S);
+> 
+> 
+> Intconf := proc (Sam, s, alpha) n := op(1, Sam); t := Quantile(RandomVariable(Normal(0, 1)), 1-(1/2)*alpha); m := Mean(Sam); [m-s*t/sqrt(n), m+(s.t)/sqrt(n)] end proc;
+> Intconf(S, 1, 0.5e-1);
+> Intconf2 := proc (Sam, alpha) n := op(1, Sam); t := Quantile(RandomVariable(StudentT(n-1)), 1-(1/2)*alpha); m := Mean(Sam); s := StandardDeviation(Sam); [m-s*t/sqrt(n), m+(s.t)/sqrt(n)] end proc;
+> Intconf2(S, 0.5e-1);
+> 
+> S2 := Sample(RandomVariable(Normal(2.5, 3)), 50);
+> Imin := [seq(evalf(Intconf(S2, 3, (1/100)*i)[1]), i = 1 .. 100)];
+> Imax := [seq(evalf(Intconf(S2, 3, (1/100)*i)[2]), i = 1 .. 100)];
+> P1 := plot([seq([(1/100)*i, Imin[i]], i = 1 .. 100)]);
+> P2 := plot([seq([(1/100)*i, Imax[i]], i = 1 .. 100)]);
+> display(P1, P2);
+> Interv := [seq(evalf(Intconf(S, 3, (1/100)*i)), i = 1 .. 100)];
+> plot([seq([(1/100)*i, Interv[i][1]], i = 1 .. 100)]);
+> 
+> Imin2 := Array(1 .. 200); Imax2 := Array(1 .. 200);
+> N := 0; for i to 200 do S := Sample(RandomVariable(Normal(2.5, 3)), 300); Imin3[i] := Intconf(S, 3, .1)[1]; Imax3[i] := Intconf(S, 3, .1)[2]; if `and`(evalf(Imin3[i]) < 2.5, evalf(Imax3[i]) > 2.5) then N := N+1 end if end do; (1/200)*N;
+> U := Sample(RandomVariable(Uniform(0, 1)), 500);
+> Xu := map(proc (t) options operator, arrow; 4*sqrt(1-t^2) end proc, U);
+> Mean(Xu);
+> StandardDeviation(Xu);
+> 
+> evalf(Intconf2(Xu, 0.5e-1));
+> V := Sample(RandomVariable(Uniform(0, 1)), 10000); Xv := map(proc (t) options operator, arrow; 4*sqrt(1-t^2) end proc, V);
+> W := CumulativeSum(Xv);
+> plot([seq([i, abs(W[i]/i-Pi)], i = 1 .. 10000)]);
+> for i to 500 do if V[2*i]^2+V[2*i+1]^2 < 1 then Y[i] := 4 else Y[i] := 0 end if end do;
+> StandardDeviation(convert(Y, list));
+> evalf(Intconf2(convert(convert(Y, list), Vector), 0.5e-1));
+> 
+> evalf(Intconf2(Xv, 0.5e-1));
+> 
+

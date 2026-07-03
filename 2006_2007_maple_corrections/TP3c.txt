@@ -1,0 +1,129 @@
+> with(stats):
+> with(statplots):
+> with(plots):
+Warning, the name changecoords has been redefined
+
+> Ech:=[random[normald[175,10]](5000)]:
+> mo::array[1..5000];
+
+                         mo::array[1 .. 5000]
+
+> s:=0;
+
+                                s := 0
+
+> for i from 1 to 5000 do s:=s+Ech[i]: mo[i]:=s/i:end do:
+> TCL:=proc(n,Nobs)
+> ech:=array[1..n]: u:=array[1..Nobs]:
+> for i from 1 to Nobs do ech:=[random[normald[175,10]](n)]:
+> u[i]:=evalf(sqrt(n)/10*(describe[mean](ech)-175)): end do: 
+> v:=convert(u,list):
+> G1:=histogram(v):
+> G2:=plot(statevalf[pdf,normald[0,1]],-2..2):
+> plots[display](G1,G2):
+> end proc:
+Warning, `ech` is implicitly declared local to procedure `TCL`
+
+Warning, `u` is implicitly declared local to procedure `TCL`
+
+Warning, `i` is implicitly declared local to procedure `TCL`
+
+Warning, `v` is implicitly declared local to procedure `TCL`
+
+Warning, `G1` is implicitly declared local to procedure `TCL`
+
+Warning, `G2` is implicitly declared local to procedure `TCL`
+
+> TCL(30,500);
+
+> TCL(1000,500);
+Warning, computation interrupted
+
+> G3:=plot([seq([k,statevalf[pf,binomiald[100,0.3]](k)],k=0..100)]):
+> G4:=plot(statevalf[pdf,normald[30,sqrt(30*0.7)]],0..100):
+> plots[display](G3,G4);
+
+> Bin:=proc(n,p,Nobs)
+> Z:=[random[binomiald[n,p]](Nobs)]:
+> H:=histogram([seq((Z[k]-n*p)/sqrt(n*p*(1-p)),k=1..Nobs)]):
+> D:=plot(statevalf[pdf,normald[0,1]],-3..3):
+> plots[display](H,D); end proc;
+Warning, `Z` is implicitly declared local to procedure `Bin`
+
+Warning, `H` is implicitly declared local to procedure `Bin`
+
+Warning, `D` is implicitly declared local to procedure `Bin`
+
+
+  Bin := proc(n, p, Nobs)
+local Z, H, D;
+    Z := [random[binomiald[n, p]](Nobs)];
+    H := histogram(
+        [seq((Z[k] - p*n)/sqrt(n*p*(1 - p)), k = 1 .. Nobs)])
+        ;
+    D := plot(statevalf[pdf, normald[0, 1]], -3 .. 3);
+    plots[display](H, D)
+end proc
+
+> Bin(100,0.3,1000);
+
+> Bin2:=proc(n,p,Nobs)
+> Z:=[random[binomiald[n,p]](Nobs)]:
+> H:=scatterplot([seq((Z[k]-n*p)/sqrt(n*p*(1-p)),k=1..Nobs)],format=quan
+> tile): H2:=xyexchange(H):
+> D:=plot(statevalf[cdf,normald[0,1]],-3..3):
+> plots[display](H2,D); end proc;
+Warning, `Z` is implicitly declared local to procedure `Bin2`
+
+Warning, `H` is implicitly declared local to procedure `Bin2`
+
+Warning, `H2` is implicitly declared local to procedure `Bin2`
+
+Warning, `D` is implicitly declared local to procedure `Bin2`
+
+
+  Bin2 := proc(n, p, Nobs)
+local Z, H, H2, D;
+    Z := [random[binomiald[n, p]](Nobs)];
+    H := scatterplot(
+        [seq((Z[k] - p*n)/sqrt(n*p*(1 - p)), k = 1 .. Nobs)],
+        format = quantile);
+    H2 := xyexchange(H);
+    D := plot(statevalf[cdf, normald[0, 1]], -3 .. 3);
+    plots[display](H2, D)
+end proc
+
+> Bin2(100,0.3,500);
+
+> Bin2(100,0.1,500);
+
+> gra:=proc(n,p)
+> G1:=plot([seq([(k-n*p)/sqrt(n*p*(1-p)),sqrt(n*p*(1-p))*statevalf[pf,bi
+> nomiald[n,p]](k)],k=0..n)]):
+> G2:=plot(statevalf[pdf,normald[0,1]]):
+> plots[display](G1,G2): end proc;
+Warning, `G1` is implicitly declared local to procedure `gra`
+
+Warning, `G2` is implicitly declared local to procedure `gra`
+
+
+  gra := proc(n, p)
+local G1, G2;
+    G1 := plot([seq([(k - p*n)/sqrt(n*p*(1 - p)),
+        sqrt(n*p*(1 - p))*statevalf[pf, binomiald[n, p]](k)],
+        k = 0 .. n)]);
+    G2 := plot(statevalf[pdf, normald[0, 1]]);
+    plots[display](G1, G2)
+end proc
+
+> gra(100,0.3);
+
+> gra(100,0.01);
+
+> gra(200,0.01);
+
+> gra(200,0.99);
+
+> gra(1000,0.1);
+
+> 

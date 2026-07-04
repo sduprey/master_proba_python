@@ -17,6 +17,7 @@
 \newtheorem{lemma}[theorem]{Lemme}
 \newtheorem{corollary}[theorem]{Corollaire}
 \theoremstyle{definition}
+\newtheorem{definition}[theorem]{Définition}
 \newtheorem{example}[theorem]{Exemple}
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remarque}
@@ -28,11 +29,15 @@
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\F}{\mathcal{F}}
+\newcommand{\G}{\mathcal{G}}
 \newcommand{\ps}{\text{p.s.}}
+\newcommand{\ind}{\mathbf{1}}
 \DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
-\title{Convergence des martingales de Doob\\et dichotomie de Kakutani}
+\title{Convergence des martingales de Doob,\\
+uniforme intégrabilité\\
+et dichotomie de Kakutani}
 \author{}
 \date{Juillet 2026}
 
@@ -40,12 +45,15 @@
 \maketitle
 
 \begin{abstract}
-Ce document présente le théorème de convergence presque sûre des martingales de Doob,
-l'inégalité des montées qui en constitue le c\oe ur, puis la dichotomie de Kakutani
-(1948) pour les martingales produit et les mesures produit infinies, avec sa preuve
-complète. On détaille le cas gaussien, sa reformulation comme théorème de
-Cameron--Martin, et les liens avec la statistique asymptotique et la finance
-mathématique.
+Ce document présente le théorème de convergence presque sûre des martingales de
+Doob avec la preuve complète de l'inégalité des montées, développe en détail la
+notion d'uniforme intégrabilité (critères, théorème de Vitali, critère de
+La~Vallée Poussin), caractérise les martingales fermées et le théorème d'arrêt
+associé, puis établit la dichotomie de Kakutani (1948) pour les martingales
+produit et les mesures produit infinies. Le cas gaussien est traité complètement,
+avec le théorème de Cameron--Martin en corollaire, et les liens avec la
+statistique asymptotique (contiguïté de Le~Cam) et la finance mathématique
+(Girsanov, Novikov) sont détaillés.
 \end{abstract}
 
 \tableofcontents
@@ -55,7 +63,10 @@ mathématique.
 %=======================================================================
 
 Dans toute la suite, $(\Omega, \F, (\F_n)_{n \ge 0}, \Prob)$ désigne un espace de
-probabilité filtré.
+probabilité filtré. Un processus $(X_n)_{n\ge0}$ adapté et intégrable est une
+\emph{sous-martingale} si $\E[X_{n+1} \mid \F_n] \ge X_n$ p.s.\ pour tout $n$,
+une \emph{surmartingale} si l'inégalité inverse a lieu, une \emph{martingale} si
+l'égalité a lieu.
 
 \begin{theorem}[Doob]\label{thm:doob}
 Soit $(X_n)_{n\ge 0}$ une sous-martingale telle que
@@ -69,27 +80,87 @@ X_n \xrightarrow[n\to\infty]{\ps} X_\infty,
 \]
 \end{theorem}
 
-\begin{remark}
-Pour une sous-martingale, la condition \eqref{eq:hyp} équivaut à la bornitude dans
-$L^1$ : en effet $\E[\abs{X_n}] = 2\,\E[X_n^+] - \E[X_n]$ et la suite
-$(\E[X_n])_n$ est croissante, donc minorée par $\E[X_0]$.
+\begin{remark}\label{rem:L1-equiv}
+Pour une sous-martingale, la condition \eqref{eq:hyp} équivaut à la bornitude
+dans $L^1$. En effet, $\abs{x} = 2x^+ - x$ donne
+$\E[\abs{X_n}] = 2\,\E[X_n^+] - \E[X_n]$, et la suite $(\E[X_n])_n$ est
+croissante (prendre l'espérance dans la propriété de sous-martingale), donc
+minorée par $\E[X_0]$ : ainsi
+$\E[\abs{X_n}] \le 2\,\E[X_n^+] - \E[X_0]$. La réciproque est immédiate puisque
+$X_n^+ \le \abs{X_n}$.
 \end{remark}
 
 \begin{corollary}\label{cor:cas-part}
-Les processus suivants convergent presque sûrement :
+Les processus suivants convergent presque sûrement vers une limite intégrable :
 \begin{enumerate}[label=(\roman*)]
 \item toute martingale bornée dans $L^1$ ;
 \item toute sous-martingale majorée par une constante ;
 \item toute surmartingale positive --- sans aucune hypothèse d'intégrabilité
-      supplémentaire, puisque $\E[X_n^+] = \E[X_n] \le \E[X_0]$.
+      supplémentaire. En effet, $(-X_n)$ est une sous-martingale négative, donc
+      $(-X_n)^+ = 0$ et \eqref{eq:hyp} est trivialement vérifiée ; de plus
+      $\E[\abs{X_n}] = \E[X_n] \le \E[X_0]$.
 \end{enumerate}
 \end{corollary}
 
-\subsection{L'inégalité des montées}
+%-----------------------------------------------------------------------
+\subsection{Transformées de martingales}
+%-----------------------------------------------------------------------
 
-Pour $a < b$ réels, on note $U_n[a,b]$ le nombre de \emph{traversées montantes}
-complètes de l'intervalle $[a,b]$ par la trajectoire $(X_0, \dots, X_n)$ :
-le nombre de fois où le processus, parti sous le niveau $a$, atteint le niveau $b$.
+L'outil de la preuve est la \emph{transformée de martingale}, version discrète de
+l'intégrale stochastique. Un processus $(C_n)_{n\ge1}$ est \emph{prévisible} si
+$C_n$ est $\F_{n-1}$-mesurable pour tout $n \ge 1$.
+
+\begin{definition}
+Pour $(C_n)$ prévisible borné et $(X_n)$ adapté intégrable, la transformée
+$C \bullet X$ est le processus
+\[
+(C \bullet X)_n = \sum_{k=1}^{n} C_k\,(X_k - X_{k-1}),
+\qquad (C \bullet X)_0 = 0.
+\]
+\end{definition}
+
+L'interprétation de jeu est utile : $X_k - X_{k-1}$ est le gain unitaire de la
+$k$-ième partie, $C_k$ la mise, décidée \emph{avant} de connaître l'issue
+(prévisibilité).
+
+\begin{lemma}\label{lem:transform}
+Si $(X_n)$ est une sous-martingale et $(C_n)$ est prévisible avec
+$0 \le C_n \le K$, alors $(C \bullet X)$ est une sous-martingale ; en
+particulier $\E[(C\bullet X)_n] \ge 0$. Si $(X_n)$ est une martingale et
+$(C_n)$ est prévisible borné (de signe quelconque), alors $(C \bullet X)$ est
+une martingale.
+\end{lemma}
+
+\begin{proof}
+Par prévisibilité de $C_{n+1}$,
+\[
+\E\bigl[(C\bullet X)_{n+1} - (C\bullet X)_n \,\big|\, \F_n\bigr]
+= C_{n+1}\, \E\bigl[X_{n+1} - X_n \mid \F_n\bigr] \ge 0,
+\]
+le produit étant licite car $C_{n+1}$ est $\F_n$-mesurable et borné. Le signe
+vient de $C_{n+1} \ge 0$ et de la propriété de sous-martingale. Le cas
+martingale est identique avec une égalité.
+\end{proof}
+
+Moralité : \emph{on ne peut pas battre un jeu défavorable ou équilibré par une
+stratégie de mise prévisible}. La preuve de l'inégalité des montées consiste à
+exhiber une stratégie qui gagnerait si le processus oscillait trop.
+
+%-----------------------------------------------------------------------
+\subsection{L'inégalité des montées}
+%-----------------------------------------------------------------------
+
+Pour $a < b$ réels, on définit récursivement les temps d'arrêt
+\[
+S_1 = \inf\{n \ge 0 : X_n \le a\}, \qquad
+T_j = \inf\{n \ge S_j : X_n \ge b\}, \qquad
+S_{j+1} = \inf\{n \ge T_j : X_n \le a\},
+\]
+avec la convention $\inf \emptyset = +\infty$, et le \emph{nombre de montées}
+avant l'instant $n$ :
+\[
+U_n[a,b] = \max\{j \ge 0 : T_j \le n\}.
+\]
 
 \begin{lemma}[Inégalité des montées de Doob]\label{lem:upcrossing}
 Si $(X_n)$ est une sous-martingale, alors pour tous $a<b$ et tout $n \ge 0$,
@@ -100,163 +171,684 @@ Si $(X_n)$ est une sous-martingale, alors pour tous $a<b$ et tout $n \ge 0$,
 \]
 \end{lemma}
 
-\begin{proof}[Preuve du théorème~\ref{thm:doob} à partir du lemme]
-Sous l'hypothèse \eqref{eq:hyp}, le membre de droite est majoré par
-$\sup_n \E[X_n^+] + \abs{a} < \infty$ uniformément en $n$. Par convergence monotone,
-$\E[U_\infty[a,b]] < \infty$, donc $U_\infty[a,b] < \infty$ presque sûrement.
-Or
+\begin{proof}
+\emph{Étape 1 : réduction à un processus positif.} Posons
+$Y_n = (X_n - a)^+$. La fonction $x \mapsto (x-a)^+$ étant convexe croissante,
+l'inégalité de Jensen conditionnelle montre que $(Y_n)$ est encore une
+sous-martingale :
 \[
-\Bigl\{\liminf_n X_n < \limsup_n X_n\Bigr\}
-= \bigcup_{\substack{a<b \\ a,b \in \Q}} \bigl\{U_\infty[a,b] = \infty\bigr\},
+\E[Y_{n+1} \mid \F_n] = \E\bigl[(X_{n+1}-a)^+ \mid \F_n\bigr]
+\ge \bigl(\E[X_{n+1} \mid \F_n] - a\bigr)^+ \ge (X_n - a)^+ = Y_n.
 \]
-union dénombrable d'événements négligeables. Donc $X_n$ converge p.s.\ dans
-$\overline{\R}$ vers une limite $X_\infty$. Le lemme de Fatou donne enfin
-$\E[\abs{X_\infty}] \le \liminf_n \E[\abs{X_n}] < \infty$, ce qui assure en
-particulier $\abs{X_\infty} < \infty$ p.s.
+De plus, les montées de $X$ sur $[a,b]$ sont exactement les montées de $Y$ sur
+$[0,\, b-a]$ : $X_n \le a \iff Y_n = 0$ et $X_n \ge b \iff Y_n \ge b-a$.
+
+\emph{Étape 2 : la stratégie \og acheter bas, vendre haut \fg.} Définissons le
+processus de mises $C_k \in \{0,1\}$ par $C_1 = \ind_{\{Y_0 = 0\}}$ et
+\[
+C_k = \ind_{\{C_{k-1} = 1\}} \ind_{\{Y_{k-1} < b-a\}}
+    + \ind_{\{C_{k-1} = 0\}} \ind_{\{Y_{k-1} = 0\}},
+\qquad k \ge 2 :
+\]
+on mise à partir du moment où $Y$ touche $0$, on cesse dès que $Y$ atteint
+$b-a$, et on attend le retour en $0$ pour recommencer. Le processus $(C_k)$ est
+prévisible ($C_k$ ne dépend que de $Y_0, \dots, Y_{k-1}$).
+
+\emph{Étape 3 : minoration trajectorielle du gain.} Chaque montée complète de
+$Y$ de $0$ à $b-a$ rapporte au moins $b-a$ à la stratégie. Après la dernière
+montée complète, deux cas : soit la stratégie est inactive ($C = 0$), gain nul ;
+soit elle est active sur une montée inachevée, et le gain partiel est
+$Y_n - Y_{\tau} = Y_n \ge 0$, où $\tau$ est le dernier instant de passage en $0$
+--- ce gain résiduel est positif \emph{parce que $Y \ge 0$ et que l'on achète en
+$Y_\tau = 0$}. D'où, trajectoire par trajectoire,
+\[
+(C \bullet Y)_n \;\ge\; (b-a)\, U_n[a,b].
+\]
+
+\emph{Étape 4 : majoration en espérance.} Le processus $D_k = 1 - C_k$ est
+prévisible à valeurs dans $[0,1]$, donc par le lemme~\ref{lem:transform},
+$\E[(D \bullet Y)_n] \ge 0$. Or $(C\bullet Y)_n + (D \bullet Y)_n = Y_n - Y_0$,
+d'où
+\[
+(b-a)\,\E\bigl[U_n[a,b]\bigr] \le \E\bigl[(C\bullet Y)_n\bigr]
+= \E[Y_n - Y_0] - \E\bigl[(D\bullet Y)_n\bigr]
+\le \E[Y_n] - \E[Y_0],
+\]
+qui est l'inégalité annoncée.
 \end{proof}
 
-\subsection{Convergence $L^1$ et martingales fermées}
+%-----------------------------------------------------------------------
+\subsection{Preuve du théorème de convergence}
+%-----------------------------------------------------------------------
 
-La convergence du théorème~\ref{thm:doob} a lieu presque sûrement, mais pas
-nécessairement dans $L^1$.
+\begin{proof}[Preuve du théorème~\ref{thm:doob}]
+Fixons $a < b$ rationnels. Comme $(X_n - a)^+ \le X_n^+ + \abs{a}$, l'hypothèse
+\eqref{eq:hyp} et le lemme~\ref{lem:upcrossing} donnent, pour tout $n$,
+\[
+\E\bigl[U_n[a,b]\bigr] \le \frac{\sup_m \E[X_m^+] + \abs{a}}{b-a} < \infty.
+\]
+La suite $U_n[a,b] \uparrow U_\infty[a,b]$ étant croissante, la convergence
+monotone donne $\E[U_\infty[a,b]] < \infty$, donc
+$U_\infty[a,b] < \infty$ presque sûrement.
 
-\begin{proposition}\label{prop:UI}
-Soit $(X_n)$ une martingale. Les assertions suivantes sont équivalentes :
-\begin{enumerate}[label=(\roman*)]
-\item la famille $(X_n)_{n \ge 0}$ est uniformément intégrable ;
-\item $X_n$ converge dans $L^1$ ;
-\item la martingale est \emph{fermée} : il existe $Z \in L^1$ telle que
-      $X_n = \E[Z \mid \F_n]$ pour tout $n$.
-\end{enumerate}
-Dans ce cas $X_n \to X_\infty$ p.s.\ et dans $L^1$, et
-$X_n = \E[X_\infty \mid \F_n]$.
+Or, si une suite réelle $(x_n)$ vérifie $\liminf x_n < \limsup x_n$, il existe
+des rationnels $a < b$ intercalés, et la suite traverse $[a,b]$ en montant une
+infinité de fois. Ainsi
+\[
+\Bigl\{\liminf_n X_n < \limsup_n X_n\Bigr\}
+\subseteq \bigcup_{\substack{a<b \\ a,b \in \Q}} \bigl\{U_\infty[a,b] = \infty\bigr\},
+\]
+union \emph{dénombrable} d'événements négligeables, donc négligeable. La limite
+$X_\infty = \lim_n X_n$ existe donc p.s.\ dans $\overline{\R} = [-\infty,
++\infty]$.
+
+Il reste à exclure les valeurs infinies. Par le lemme de Fatou et la
+remarque~\ref{rem:L1-equiv},
+\[
+\E\bigl[\abs{X_\infty}\bigr]
+= \E\Bigl[\liminf_n \abs{X_n}\Bigr]
+\le \liminf_n \E\bigl[\abs{X_n}\bigr]
+\le \sup_n \E\bigl[\abs{X_n}\bigr] < \infty,
+\]
+donc $\abs{X_\infty} < \infty$ p.s.\ et $X_\infty \in L^1$.
+\end{proof}
+
+\begin{remark}
+La preuve montre au passage que l'hypothèse \eqref{eq:hyp} ne sert qu'à borner
+uniformément le membre de droite de l'inégalité des montées : c'est la
+non-oscillation qui est au c\oe ur du théorème. La convergence obtenue est
+presque sûre ; savoir si elle a lieu dans $L^1$ est une question strictement
+plus fine, qui fait l'objet des deux sections suivantes.
+\end{remark}
+
+%=======================================================================
+\section{Uniforme intégrabilité}
+%=======================================================================
+
+%-----------------------------------------------------------------------
+\subsection{Définition et premières propriétés}
+%-----------------------------------------------------------------------
+
+\begin{definition}\label{def:UI}
+Une famille $(X_i)_{i \in I}$ de variables aléatoires est \emph{uniformément
+intégrable} (UI) si
+\[
+\lim_{c \to \infty} \; \sup_{i \in I} \;
+\E\bigl[\abs{X_i}\, \ind_{\{\abs{X_i} > c\}}\bigr] = 0.
+\]
+\end{definition}
+
+Pour une variable $X$ intégrable \emph{isolée}, on a toujours
+$\E[\abs{X}\ind_{\{\abs{X}>c\}}] \to 0$ par convergence dominée
+(domination par $\abs{X}$). La définition~\ref{def:UI} exige que ce contrôle des
+queues soit \emph{uniforme sur la famille} : un même seuil $c$ doit fonctionner
+pour tous les $X_i$ simultanément. Intuitivement : \emph{aucune masse $L^1$ ne
+peut s'échapper vers l'infini le long de la famille}.
+
+\begin{proposition}\label{prop:UI-L1}
+Si $(X_i)_{i\in I}$ est UI, alors $\sup_i \E[\abs{X_i}] < \infty$. La réciproque
+est fausse.
 \end{proposition}
 
-La dichotomie de Kakutani, objet de la section suivante, fournit un critère
-\emph{exact} d'intégrabilité uniforme pour une classe importante de martingales :
-les martingales produit.
+\begin{proof}
+Choisissons $c$ tel que $\sup_i \E[\abs{X_i}\ind_{\{\abs{X_i}>c\}}] \le 1$.
+Alors pour tout $i$,
+\[
+\E[\abs{X_i}] = \E\bigl[\abs{X_i}\ind_{\{\abs{X_i}\le c\}}\bigr]
++ \E\bigl[\abs{X_i}\ind_{\{\abs{X_i}>c\}}\bigr] \le c + 1.
+\]
+Contre-exemple pour la réciproque : $X_n = n\,\ind_{A_n}$ avec
+$\Prob(A_n) = 1/n$. Alors $\E[\abs{X_n}] = 1$ pour tout $n$, mais pour tout $c$
+fixé et tout $n > c$, $\E[\abs{X_n}\ind_{\{\abs{X_n}>c\}}] = 1$ : la masse
+unité est intégralement portée par des valeurs qui divergent. C'est le schéma
+exact de la martingale exponentielle de l'exemple~\ref{ex:gauss} ci-dessous.
+\end{proof}
+
+Une reformulation équivalente, souvent plus maniable, sépare bornitude et
+\emph{absolue continuité uniforme}.
+
+\begin{proposition}\label{prop:UI-eps-delta}
+$(X_i)_{i\in I}$ est UI si et seulement si les deux conditions suivantes sont
+réunies :
+\begin{enumerate}[label=(\alph*)]
+\item $\sup_i \E[\abs{X_i}] < \infty$ ;
+\item pour tout $\varepsilon > 0$, il existe $\delta > 0$ tel que pour tout
+      événement $A$ avec $\Prob(A) \le \delta$, on ait
+      $\sup_i \E[\abs{X_i}\ind_A] \le \varepsilon$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+\emph{UI $\Rightarrow$ (a), (b).} (a) est la proposition~\ref{prop:UI-L1}. Pour
+(b) : soit $\varepsilon > 0$ et $c$ tel que
+$\sup_i \E[\abs{X_i}\ind_{\{\abs{X_i}>c\}}] \le \varepsilon/2$ ; alors pour
+$\Prob(A) \le \delta := \varepsilon/(2c)$,
+\[
+\E[\abs{X_i}\ind_A]
+\le \E\bigl[\abs{X_i}\ind_{A \cap \{\abs{X_i}\le c\}}\bigr]
++ \E\bigl[\abs{X_i}\ind_{\{\abs{X_i}>c\}}\bigr]
+\le c\,\Prob(A) + \frac{\varepsilon}{2} \le \varepsilon.
+\]
+\emph{(a), (b) $\Rightarrow$ UI.} Par l'inégalité de Markov,
+$\Prob(\abs{X_i} > c) \le \E[\abs{X_i}]/c \le M/c$ avec
+$M = \sup_i \E[\abs{X_i}]$, uniformément en $i$. Pour $\varepsilon$ donné,
+prendre $\delta$ fourni par (b) puis $c > M/\delta$ : l'événement
+$A_i = \{\abs{X_i} > c\}$ vérifie $\Prob(A_i) \le \delta$, donc
+$\E[\abs{X_i}\ind_{A_i}] \le \varepsilon$ pour tout $i$.
+\end{proof}
+
+%-----------------------------------------------------------------------
+\subsection{Critères pratiques}
+%-----------------------------------------------------------------------
+
+\begin{proposition}[Critères suffisants]\label{prop:criteres}
+Chacune des conditions suivantes implique l'uniforme intégrabilité de
+$(X_i)_{i\in I}$ :
+\begin{enumerate}[label=(\roman*)]
+\item \emph{bornitude dans $L^p$, $p > 1$} :
+      $\sup_i \norm{X_i}_p < \infty$ ;
+\item \emph{domination} : il existe $Y \in L^1$ telle que $\abs{X_i} \le Y$
+      p.s.\ pour tout $i$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) Sur $\{\abs{X_i} > c\}$ on a $1 \le (\abs{X_i}/c)^{p-1}$, donc
+\[
+\E\bigl[\abs{X_i}\ind_{\{\abs{X_i}>c\}}\bigr]
+\le \E\Bigl[\abs{X_i}\cdot \frac{\abs{X_i}^{p-1}}{c^{p-1}}\Bigr]
+= \frac{\E[\abs{X_i}^p]}{c^{p-1}}
+\le \frac{\sup_i \norm{X_i}_p^p}{c^{p-1}}
+\xrightarrow[c\to\infty]{} 0.
+\]
+(ii) $\E[\abs{X_i}\ind_{\{\abs{X_i}>c\}}] \le \E[Y \ind_{\{Y>c\}}] \to 0$ par
+convergence dominée, la borne étant indépendante de $i$.
+\end{proof}
+
+Le critère suivant est \emph{exact} : il caractérise l'UI.
+
+\begin{theorem}[La Vallée Poussin]\label{thm:LVP}
+$(X_i)_{i\in I}$ est UI si et seulement s'il existe une fonction
+$\varphi : \R_+ \to \R_+$ croissante avec
+$\varphi(x)/x \to \infty$ quand $x \to \infty$, telle que
+\[
+\sup_{i\in I} \E\bigl[\varphi(\abs{X_i})\bigr] < \infty.
+\]
+On peut de plus choisir $\varphi$ convexe.
+\end{theorem}
+
+\begin{proof}
+\emph{Suffisance.} Posons $M = \sup_i \E[\varphi(\abs{X_i})]$ et
+$\psi(c) = \inf_{x > c} \varphi(x)/x \to \infty$. Sur $\{\abs{X_i} > c\}$,
+$\abs{X_i} \le \varphi(\abs{X_i})/\psi(c)$, donc
+\[
+\E\bigl[\abs{X_i}\ind_{\{\abs{X_i}>c\}}\bigr]
+\le \frac{\E[\varphi(\abs{X_i})]}{\psi(c)} \le \frac{M}{\psi(c)}
+\xrightarrow[c\to\infty]{} 0,
+\]
+uniformément en $i$.
+
+\emph{Nécessité (esquisse).} Par UI, on peut choisir une suite
+$c_k \uparrow \infty$ telle que
+$\sup_i \E[\abs{X_i}\ind_{\{\abs{X_i}>c_k\}}] \le 2^{-k}$. On pose
+$\varphi(x) = \sum_{k\ge1} (x - c_k)^+$, fonction convexe croissante ; comme le
+nombre de termes actifs en $x$ tend vers l'infini, $\varphi(x)/x \to \infty$.
+Enfin, en utilisant $(x-c)^+ \le x\,\ind_{\{x > c\}}$,
+\[
+\E\bigl[\varphi(\abs{X_i})\bigr]
+\le \sum_{k\ge1} \E\bigl[\abs{X_i}\ind_{\{\abs{X_i}>c_k\}}\bigr]
+\le \sum_{k\ge1} 2^{-k} = 1,
+\]
+uniformément en $i$.
+\end{proof}
+
+\begin{remark}
+Le cas $\varphi(x) = x^p$ redonne le critère $L^p$ de la
+proposition~\ref{prop:criteres}. Mais des croissances beaucoup plus lentes
+suffisent : $\varphi(x) = x \log^+ x$ donne la classe $L\log L$, frontière
+naturelle dans les inégalités maximales de Doob (l'inégalité
+$\norm{\sup_n \abs{X_n}}_1 \lesssim 1 + \sup_n \E[\abs{X_n}\log^+\abs{X_n}]$
+échoue dans $L^1$ pur) et en théorie ergodique.
+\end{remark}
+
+%-----------------------------------------------------------------------
+\subsection{Le théorème de Vitali}
+%-----------------------------------------------------------------------
+
+L'UI est exactement le chaînon manquant entre convergence en probabilité et
+convergence $L^1$.
+
+\begin{theorem}[Vitali]\label{thm:vitali}
+Soit $(X_n)$ une suite de variables intégrables convergeant en probabilité vers
+$X$. Alors les assertions suivantes sont équivalentes :
+\begin{enumerate}[label=(\roman*)]
+\item $(X_n)$ est uniformément intégrable ;
+\item $X \in L^1$ et $X_n \to X$ dans $L^1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{(i) $\Rightarrow$ (ii).} Une sous-suite $(X_{n_k})$ converge p.s.\ vers
+$X$ ; par Fatou et la proposition~\ref{prop:UI-L1},
+$\E[\abs{X}] \le \liminf_k \E[\abs{X_{n_k}}] < \infty$, donc $X \in L^1$.
+Introduisons la troncature $\varphi_c(x) = (x \wedge c) \vee (-c)$, qui vérifie
+$\abs{x - \varphi_c(x)} = (\abs{x} - c)^+ \le \abs{x}\ind_{\{\abs{x}>c\}}$.
+Alors
+\[
+\E\abs{X_n - X}
+\le \underbrace{\E\abs{X_n - \varphi_c(X_n)}}_{\le\, \sup_m \E[\abs{X_m}\ind_{\{\abs{X_m}>c\}}]}
++ \E\abs{\varphi_c(X_n) - \varphi_c(X)}
++ \underbrace{\E\abs{\varphi_c(X) - X}}_{\le\, \E[\abs{X}\ind_{\{\abs{X}>c\}}]}.
+\]
+Soit $\varepsilon > 0$. Par UI (premier terme) et intégrabilité de $X$
+(troisième terme), on choisit $c$ rendant ces deux termes $\le \varepsilon$
+uniformément en $n$. Le terme central tend vers $0$ : $\varphi_c$ étant
+$1$-lipschitzienne, $\varphi_c(X_n) \to \varphi_c(X)$ en probabilité, et la
+suite est bornée par $c$, donc la convergence a lieu dans $L^1$ (convergence
+dominée le long de sous-suites p.s., puis argument de sous-sous-suites).
+D'où $\limsup_n \E\abs{X_n - X} \le 2\varepsilon$.
+
+\emph{(ii) $\Rightarrow$ (i).} On utilise la caractérisation de la
+proposition~\ref{prop:UI-eps-delta}. La bornitude $L^1$ est claire. Pour
+l'absolue continuité uniforme : soit $\varepsilon > 0$ et $N$ tel que
+$\E\abs{X_n - X} \le \varepsilon/2$ pour $n > N$. La famille \emph{finie}
+$\{X_1, \dots, X_N, X\}$ est UI (chaque variable intégrable l'est, et un
+maximum fini de seuils convient), donc il existe $\delta$ tel que
+$\Prob(A) \le \delta$ implique $\E[\abs{X_k}\ind_A] \le \varepsilon/2$ pour
+$k \le N$ et $\E[\abs{X}\ind_A] \le \varepsilon/2$. Pour $n > N$,
+$\E[\abs{X_n}\ind_A] \le \E\abs{X_n - X} + \E[\abs{X}\ind_A] \le \varepsilon$.
+\end{proof}
+
+\begin{remark}
+Vitali généralise strictement la convergence dominée : la domination par un
+$Y \in L^1$ fixe implique l'UI (proposition~\ref{prop:criteres}(ii)), mais l'UI
+est plus faible, et surtout elle est \emph{nécessaire et suffisante}.
+\end{remark}
+
+%-----------------------------------------------------------------------
+\subsection{Un fait structurel : les espérances conditionnelles d'une
+variable fixée}
+%-----------------------------------------------------------------------
+
+\begin{theorem}\label{thm:cond-UI}
+Soit $Z \in L^1$. La famille
+\[
+\bigl\{\E[Z \mid \G] \;:\; \G \text{ sous-tribu de } \F\bigr\}
+\]
+est uniformément intégrable.
+\end{theorem}
+
+\begin{proof}
+Notons $X_\G = \E[Z \mid \G]$ et $c > 0$. Par l'inégalité de Jensen
+conditionnelle, $\abs{X_\G} \le \E[\abs{Z} \mid \G]$, donc, l'événement
+$\{\abs{X_\G} > c\}$ étant $\G$-mesurable,
+\[
+\E\bigl[\abs{X_\G}\,\ind_{\{\abs{X_\G}>c\}}\bigr]
+\le \E\bigl[\E[\abs{Z}\mid\G]\,\ind_{\{\abs{X_\G}>c\}}\bigr]
+= \E\bigl[\abs{Z}\,\ind_{\{\abs{X_\G}>c\}}\bigr],
+\]
+la dernière égalité par définition de l'espérance conditionnelle. Par Markov et
+Jensen,
+\[
+\Prob\bigl(\abs{X_\G} > c\bigr) \le \frac{\E[\abs{X_\G}]}{c}
+\le \frac{\E[\abs{Z}]}{c},
+\]
+majoration \emph{indépendante de $\G$}. Enfin, la mesure finie
+$A \mapsto \E[\abs{Z}\ind_A]$ est absolument continue par rapport à $\Prob$ :
+pour tout $\varepsilon$, il existe $\delta$ tel que $\Prob(A) \le \delta$
+implique $\E[\abs{Z}\ind_A] \le \varepsilon$ (tronquer $\abs{Z}$ à un niveau
+$c_0$ tel que $\E[\abs{Z}\ind_{\{\abs{Z}>c_0\}}] \le \varepsilon/2$, puis
+$\delta = \varepsilon/(2c_0)$). En combinant : pour $c \ge \E[\abs{Z}]/\delta$,
+tous les événements $\{\abs{X_\G}>c\}$ ont probabilité $\le \delta$, donc
+$\sup_\G \E[\abs{X_\G}\ind_{\{\abs{X_\G}>c\}}] \le \varepsilon$.
+\end{proof}
+
+Ce résultat est remarquable : \emph{le conditionnement ne peut pas créer de
+fuite de masse}, quelle que soit la tribu. Il fournit immédiatement la moitié
+facile de la caractérisation des martingales fermées.
 
 %=======================================================================
-\section{La dichotomie de Kakutani}
+\section{Martingales fermées et théorème d'arrêt}
 %=======================================================================
 
+%-----------------------------------------------------------------------
+\subsection{La caractérisation}
+%-----------------------------------------------------------------------
+
+\begin{theorem}[Martingales fermées]\label{thm:fermee}
+Soit $(X_n)_{n\ge0}$ une martingale. Les assertions suivantes sont
+équivalentes :
+\begin{enumerate}[label=(\roman*)]
+\item la famille $(X_n)_{n \ge 0}$ est uniformément intégrable ;
+\item $(X_n)$ converge dans $L^1$ ;
+\item il existe $Z \in L^1$ telle que $X_n = \E[Z \mid \F_n]$ pour tout $n$
+      (la martingale est \emph{fermée}).
+\end{enumerate}
+Dans ce cas, $X_n \to X_\infty$ p.s.\ et dans $L^1$, et
+$X_n = \E[X_\infty \mid \F_n]$ pour tout $n$ ; on peut prendre
+$X_\infty = \E[Z \mid \F_\infty]$ où $\F_\infty = \sigma\bigl(\bigcup_n
+\F_n\bigr)$.
+\end{theorem}
+
+\begin{proof}
+\emph{(i) $\Rightarrow$ (ii).} L'UI donne la bornitude $L^1$
+(proposition~\ref{prop:UI-L1}), donc la convergence p.s.\ vers $X_\infty$ par le
+théorème~\ref{thm:doob} ; la convergence p.s.\ implique la convergence en
+probabilité, et Vitali (théorème~\ref{thm:vitali}) conclut à la convergence
+$L^1$.
+
+\emph{(ii) $\Rightarrow$ (iii).} Notons $X_\infty$ la limite $L^1$. Fixons $n$
+et faisons tendre $m \to \infty$ dans l'identité de martingale
+$X_n = \E[X_m \mid \F_n]$ ($m \ge n$) : l'espérance conditionnelle est une
+contraction de $L^1$
+($\E\abs{\E[X_m \mid \F_n] - \E[X_\infty \mid \F_n]} \le \E\abs{X_m -
+X_\infty}$), donc $X_n = \E[X_\infty \mid \F_n]$, et (iii) tient avec
+$Z = X_\infty$.
+
+\emph{(iii) $\Rightarrow$ (i).} C'est le théorème~\ref{thm:cond-UI} appliqué à
+la sous-famille $\{\E[Z\mid\F_n]\}_{n\ge0}$.
+
+\emph{Identification de la limite.} Supposons (iii). La martingale est UI donc
+converge p.s.\ et $L^1$ vers une limite $X_\infty$, qui est
+$\F_\infty$-mesurable. Montrons $X_\infty = \E[Z \mid \F_\infty]$. Pour
+$A \in \F_n$ fixé et $m \ge n$,
+$\E[X_m \ind_A] = \E\bigl[\E[Z\mid\F_m]\ind_A\bigr] = \E[Z\ind_A]$ ; la
+convergence $L^1$ donne à la limite $\E[X_\infty \ind_A] = \E[Z \ind_A]$. Les
+deux mesures finies signées $A \mapsto \E[X_\infty\ind_A]$ et
+$A \mapsto \E[Z\ind_A]$ coïncident donc sur le $\pi$-système
+$\bigcup_n \F_n$, stable par intersection finie et engendrant $\F_\infty$ ; par
+le lemme de classe monotone, elles coïncident sur $\F_\infty$, ce qui
+caractérise $X_\infty = \E[Z\mid\F_\infty]$.
+\end{proof}
+
+\begin{corollary}[Théorème de convergence de Lévy]\label{cor:levy}
+Pour toute $Z \in L^1$,
+\[
+\E[Z \mid \F_n] \xrightarrow[n\to\infty]{\ps \text{ et } L^1}
+\E[Z \mid \F_\infty].
+\]
+\end{corollary}
+
+\begin{remark}[Deux mondes]\label{rem:deux-mondes}
+Le théorème~\ref{thm:fermee} trace une frontière structurelle au sein des
+martingales convergentes.
+\begin{itemize}
+\item \emph{Martingales fermées} : $X_n = \E[X_\infty \mid \F_n]$. La
+martingale est la révélation progressive d'une variable terminale ; toute
+l'information vit \og au bout \fg{} et le processus se reconstruit depuis sa
+limite. C'est le cas de l'urne de Pólya ($M_n = \E[M_\infty \mid \F_n]$ avec
+$M_\infty$ de loi Beta) et du processus de densité dans le cas équivalent de la
+dichotomie de Kakutani.
+\item \emph{Martingales non fermées} : la limite p.s.\ existe (si bornitude
+$L^1$) mais a \og oublié \fg{} de la masse. Pour une martingale positive, le
+lemme de Fatou donne seulement $\E[X_\infty] \le \liminf \E[X_n]$, et
+l'inégalité peut être stricte. Le processus n'est alors \emph{pas} déterminé
+par sa limite : dans le cas dégénéré de Kakutani, $\E[X_\infty \mid \F_n] = 0
+\ne X_n$.
+\end{itemize}
+La dichotomie de Kakutani (section~\ref{sec:kakutani}) est précisément un
+critère \emph{exact} de fermeture pour la classe des martingales produit.
+\end{remark}
+
+%-----------------------------------------------------------------------
+\subsection{Le théorème d'arrêt sous uniforme intégrabilité}
+%-----------------------------------------------------------------------
+
+Rappelons que pour un temps d'arrêt $T$, la tribu du passé jusqu'à $T$ est
+$\F_T = \{A \in \F : A \cap \{T \le n\} \in \F_n \ \forall n\}$.
+
+\begin{theorem}[Arrêt optionnel, version UI]\label{thm:arret}
+Soit $(X_n)$ une martingale uniformément intégrable, de limite $X_\infty$, et
+soient $S \le T$ deux temps d'arrêt quelconques (éventuellement infinis, en
+posant $X_T = X_\infty$ sur $\{T = \infty\}$). Alors $X_S, X_T \in L^1$ et
+\[
+\E[X_T \mid \F_S] = X_S \qquad \ps ;
+\qquad \text{en particulier } \E[X_T] = \E[X_S] = \E[X_0].
+\]
+\end{theorem}
+
+\begin{proof}
+\emph{Étape 1 : $X_T = \E[X_\infty \mid \F_T]$.} Soit $A \in \F_T$. On
+décompose $A = \bigsqcup_{n \in \N \cup \{\infty\}} A \cap \{T = n\}$ avec
+$A \cap \{T=n\} \in \F_n$. Par fermeture
+(théorème~\ref{thm:fermee}), $X_n = \E[X_\infty \mid \F_n]$, donc
+\[
+\E\bigl[X_T \ind_{A \cap \{T=n\}}\bigr]
+= \E\bigl[X_n \ind_{A \cap \{T=n\}}\bigr]
+= \E\bigl[X_\infty \ind_{A \cap \{T=n\}}\bigr].
+\]
+La sommation sur $n$ est licite : les termes
+$\E[\abs{X_\infty}\ind_{A\cap\{T=n\}}]$ sont sommables (de somme
+$\le \E\abs{X_\infty}$), et pour le membre de gauche on utilise l'UI de la
+famille $\{\E[X_\infty\mid\G]\}$ (théorème~\ref{thm:cond-UI}) qui rend la série
+absolument convergente. D'où $\E[X_T\ind_A] = \E[X_\infty\ind_A]$ pour tout
+$A \in \F_T$, ce qui est exactement $X_T = \E[X_\infty\mid\F_T]$ ; en
+particulier $X_T \in L^1$.
+
+\emph{Étape 2 : tour d'espérances conditionnelles.} Comme $S \le T$, on a
+$\F_S \subseteq \F_T$, et par emboîtement
+\[
+\E[X_T \mid \F_S] = \E\bigl[\E[X_\infty \mid \F_T] \,\big|\, \F_S\bigr]
+= \E[X_\infty \mid \F_S] = X_S. \qedhere
+\]
+\end{proof}
+
+\begin{example}[La stratégie de doublement]\label{ex:doubling}
+Sans UI, le théorème échoue même pour $T < \infty$ p.s. Soient $(\varepsilon_k)$
+i.i.d.\ uniformes sur $\{-1,+1\}$ et la stratégie de mise doublée : on mise
+$2^{k-1}$ à la $k$-ième partie tant qu'on a perdu, on s'arrête au premier gain,
+$T = \inf\{k : \varepsilon_k = +1\}$ (fini p.s., de loi géométrique). Le
+capital $X_n = \sum_{k=1}^{n \wedge T} 2^{k-1}\varepsilon_k$ est une
+transformée de martingale, donc une martingale (lemme~\ref{lem:transform}),
+avec $\E[X_n] = 0$. Sur $\{T \le n\}$, les pertes $1 + 2 + \cdots + 2^{T-2} =
+2^{T-1} - 1$ sont exactement compensées et dépassées : $X_n = 1$. Sur
+$\{T > n\}$ (probabilité $2^{-n}$), $X_n = -(2^n - 1)$. Ainsi
+\[
+X_n \xrightarrow{\ps} X_T = 1, \qquad \text{mais} \qquad
+\E[X_T] = 1 \ne 0 = \E[X_0].
+\]
+La martingale est pourtant bornée dans $L^1$
+($\E\abs{X_n} = (1 - 2^{-n}) + 2^{-n}(2^n - 1) \le 2$) : c'est l'UI qui fait
+défaut, la masse négative $-(2^n-1) \cdot 2^{-n} \approx -1$ étant portée par
+des valeurs divergentes --- de nouveau le mécanisme de fuite à l'infini.
+\end{example}
+
+%=======================================================================
+\section{La dichotomie de Kakutani}\label{sec:kakutani}
+%=======================================================================
+
+%-----------------------------------------------------------------------
 \subsection{Formulation martingale}
+%-----------------------------------------------------------------------
 
 \begin{theorem}[Kakutani, 1948 --- version martingale]\label{thm:kakutani-mart}
-Soit $(\xi_k)_{k \ge 1}$ une suite de variables aléatoires indépendantes, positives,
-d'espérance $\E[\xi_k] = 1$, et soit
+Soit $(\xi_k)_{k \ge 1}$ une suite de variables aléatoires indépendantes,
+positives, d'espérance $\E[\xi_k] = 1$, et soit
 \[
 X_n = \prod_{k=1}^{n} \xi_k, \qquad X_0 = 1,
 \]
-la martingale produit associée. On pose $a_k = \E\bigl[\sqrt{\xi_k}\bigr] \in (0,1]$.
-Alors exactement l'une des deux situations suivantes se produit :
+la martingale produit associée. On pose
+$a_k = \E\bigl[\sqrt{\xi_k}\bigr] \in (0,1]$. Alors exactement l'une des deux
+situations suivantes se produit :
 \begin{enumerate}[label=(\Alph*)]
 \item $\displaystyle\prod_{k\ge 1} a_k > 0$
-      \emph{(de manière équivalente $\sum_k (1-a_k) < \infty$)} :
+      \emph{(de manière équivalente : $\sum_k (1-a_k) < \infty$)} :
       la martingale $(X_n)$ est uniformément intégrable, $X_n \to X_\infty$
-      p.s.\ et dans $L^1$, et $\E[X_\infty] = 1$ ;
+      p.s.\ et dans $L^1$, $\E[X_\infty] = 1$, et $\Prob(X_\infty > 0) = 1$ ;
 \item $\displaystyle\prod_{k\ge 1} a_k = 0$ :
       \quad $X_\infty = 0$ presque sûrement.
 \end{enumerate}
 \end{theorem}
 
 \begin{remark}
-Noter que $a_k \le 1$ résulte de l'inégalité de Cauchy--Schwarz
-($\E[\sqrt{\xi_k}] \le \sqrt{\E[\xi_k]} = 1$), avec égalité si et seulement si
-$\xi_k = 1$ p.s. Le produit $\prod_k a_k$ mesure donc l'accumulation des
-perturbations : chaque facteur non trivial coûte strictement.
+(a) L'inégalité $a_k \le 1$ résulte de Cauchy--Schwarz :
+$\E[\sqrt{\xi_k}] \le \sqrt{\E[\xi_k]} = 1$, avec égalité si et seulement si
+$\xi_k = 1$ p.s.
+
+(b) L'équivalence entre $\prod_k a_k > 0$ et $\sum_k (1 - a_k) < \infty$ est le
+critère classique des produits infinis : comme $a_k \in (0,1]$,
+$\prod_k a_k > 0 \iff \sum_k (-\log a_k) < \infty$, et
+$-\log a_k \sim 1 - a_k$ lorsque $a_k \to 1$ (si $a_k \not\to 1$, les deux
+conditions échouent simultanément).
+
+(c) Le produit $\prod_k a_k$ mesure l'accumulation des perturbations : chaque
+facteur non trivial coûte strictement, et la question est de savoir si le coût
+total est fini.
 \end{remark}
 
 \begin{proof}
 Dans les deux cas, $(X_n)$ est une martingale positive, donc converge p.s.\ vers
-une limite $X_\infty \ge 0$ intégrable (corollaire~\ref{cor:cas-part}).
+une limite $X_\infty \ge 0$ intégrable (corollaire~\ref{cor:cas-part}(iii)).
 
 \medskip
-\noindent\emph{Cas (A).} Posons
+\noindent\emph{Cas (A).} Posons $\pi_n = \prod_{k=1}^n a_k$ et
 \[
 Y_n = \prod_{k=1}^{n} \frac{\sqrt{\xi_k}}{a_k}.
 \]
-Par indépendance, $(Y_n)$ est une martingale positive de moyenne $1$, et
+Les facteurs $\sqrt{\xi_k}/a_k$ sont indépendants, positifs, d'espérance $1$,
+donc $(Y_n)$ est une martingale positive de moyenne $1$. Son moment d'ordre
+deux se calcule par indépendance :
 \[
 \E\bigl[Y_n^2\bigr]
 = \prod_{k=1}^{n} \frac{\E[\xi_k]}{a_k^2}
 = \prod_{k=1}^{n} a_k^{-2}
-\;\le\; \Bigl(\prod_{k\ge 1} a_k\Bigr)^{-2} < \infty.
+= \pi_n^{-2}
+\;\le\; \Bigl(\prod_{k\ge 1} a_k\Bigr)^{-2} =: K < \infty.
 \]
-La martingale $(Y_n)$ est donc bornée dans $L^2$ : elle converge dans $L^2$
-(et p.s.) vers une limite $Y_\infty$. Comme
+La martingale $(Y_n)$ est bornée dans $L^2$, donc UI
+(proposition~\ref{prop:criteres}(i)) ; elle converge p.s., et la convergence a
+lieu dans $L^2$ : en effet, pour $m < n$, l'orthogonalité des accroissements de
+martingale dans $L^2$ donne
+$\E[(Y_n - Y_m)^2] = \E[Y_n^2] - \E[Y_m^2] = \pi_n^{-2} - \pi_m^{-2} \to 0$,
+la suite $(\pi_n^{-2})$ étant croissante convergente : $(Y_n)$ est de Cauchy
+dans $L^2$.
+
+Comme $X_n = Y_n^2\, \pi_n^2$, il reste à voir que $Y_n^2 \to Y_\infty^2$ dans
+$L^1$. Par Cauchy--Schwarz,
 \[
-X_n = Y_n^2 \prod_{k=1}^{n} a_k^2,
+\E\bigl[\abs{Y_n^2 - Y_\infty^2}\bigr]
+= \E\bigl[\abs{Y_n - Y_\infty}\,(Y_n + Y_\infty)\bigr]
+\le \norm{Y_n - Y_\infty}_2 \,\norm{Y_n + Y_\infty}_2
+\le 2\sqrt{K}\,\norm{Y_n - Y_\infty}_2 \to 0.
 \]
-et que $Y_n^2 \to Y_\infty^2$ dans $L^1$ (convergence $L^2$ de $Y_n$ plus
-bornitude $L^2$), la suite $(X_n)$ converge dans $L^1$. La
-proposition~\ref{prop:UI} donne l'intégrabilité uniforme et
-$\E[X_\infty] = \lim_n \E[X_n] = 1$ ; en particulier
-$\Prob(X_\infty > 0) > 0$.
+Avec $\pi_n^2 \to \pi_\infty^2 > 0$, on conclut que $X_n \to X_\infty =
+Y_\infty^2 \pi_\infty^2$ dans $L^1$. Le théorème~\ref{thm:fermee} donne l'UI et
+$\E[X_\infty] = \lim_n \E[X_n] = 1$.
+
+Montrons enfin $\Prob(X_\infty > 0) = 1$ et non seulement $> 0$. Supposons de
+plus $\xi_k > 0$ p.s.\ pour tout $k$ --- hypothèse naturelle, puisque dans
+l'application aux mesures produit les $\xi_k$ sont des densités de mesures
+équivalentes ; elle est d'ailleurs nécessaire, car $\Prob(\xi_{k_0} = 0) > 0$
+pour un seul $k_0$ entraîne $\Prob(X_\infty = 0) > 0$. Sous cette hypothèse,
+modifier un nombre fini de facteurs $\xi_1, \dots, \xi_m$ multiplie $X_\infty$
+par une constante aléatoire strictement positive, donc l'événement
+$\{X_\infty > 0\}$ appartient à la tribu asymptotique
+$\bigcap_m \sigma(\xi_k,\, k > m)$. Par la loi du zéro--un de Kolmogorov,
+$\Prob(X_\infty > 0) \in \{0, 1\}$, et $\E[X_\infty] = 1$ exclut la valeur
+$0$ : ainsi $\Prob(X_\infty > 0) = 1$.
 
 \medskip
 \noindent\emph{Cas (B).} Par indépendance,
 \[
-\E\bigl[\sqrt{X_n}\bigr] = \prod_{k=1}^{n} a_k \xrightarrow[n\to\infty]{} 0.
+\E\bigl[\sqrt{X_n}\bigr] = \prod_{k=1}^{n} \E[\sqrt{\xi_k}]
+= \pi_n \xrightarrow[n\to\infty]{} 0.
 \]
-Comme $\sqrt{X_n} \to \sqrt{X_\infty}$ p.s., le lemme de Fatou donne
+Comme $\sqrt{X_n} \to \sqrt{X_\infty}$ p.s.\ (continuité de la racine), le
+lemme de Fatou donne
 \[
 \E\bigl[\sqrt{X_\infty}\bigr] \le \liminf_n \E\bigl[\sqrt{X_n}\bigr] = 0,
 \]
-donc $X_\infty = 0$ p.s.
+donc $\sqrt{X_\infty} = 0$ p.s., soit $X_\infty = 0$ p.s.
 \end{proof}
 
-\begin{remark}[Tout ou rien]
-Il n'existe aucun régime intermédiaire : $\Prob(X_\infty > 0)$ vaut soit une
-quantité rendant la martingale fermée avec $\E[X_\infty]=1$, soit exactement $0$.
-On peut le relier à une loi du zéro--un : l'événement $\{X_\infty > 0\}$ est,
-modulo un ensemble négligeable, mesurable par rapport à la tribu asymptotique des
-$(\xi_k)$, donc de probabilité $0$ ou $1$ par la loi de Kolmogorov.
+\begin{remark}[Pourquoi la racine carrée ?]
+Le choix de l'exposant $1/2$ n'est pas anecdotique. Pour $\theta \in (0,1)$, la
+fonction $x \mapsto x^\theta$ est concave, donc $\E[\xi_k^\theta] \le 1$ et le
+même argument de Fatou fonctionne dans le cas dégénéré. Mais c'est $\theta =
+1/2$ qui rend le calcul du cas (A) exact : $\E[(\sqrt{\xi_k}/a_k)^2] =
+\E[\xi_k]/a_k^2 = a_k^{-2}$ utilise précisément le fait que le carré de la
+racine redonne $\xi_k$, d'espérance connue. L'exposant $1/2$ est aussi celui
+qui fait apparaître l'affinité de Hellinger, quantité symétrique en $(P,Q)$ ---
+voir ci-dessous.
 \end{remark}
 
+%-----------------------------------------------------------------------
 \subsection{Formulation en théorie de la mesure}
+%-----------------------------------------------------------------------
 
 \begin{theorem}[Kakutani --- mesures produit]\label{thm:kakutani-mes}
-Soient $(E_k, \mathcal{E}_k)_{k\ge1}$ des espaces mesurables et, sur chacun, deux
-probabilités équivalentes $P_k \sim Q_k$. On définit sur l'espace produit
-$E = \prod_k E_k$ les mesures
+Soient $(E_k, \mathcal{E}_k)_{k\ge1}$ des espaces mesurables et, sur chacun,
+deux probabilités équivalentes $P_k \sim Q_k$. On définit sur l'espace produit
+$E = \prod_k E_k$, muni de la tribu produit, les mesures
 \[
 P = \bigotimes_{k\ge1} P_k, \qquad Q = \bigotimes_{k\ge1} Q_k,
 \]
 et l'\emph{affinité de Hellinger} de chaque facteur
 \[
-\rho_k = \int_{E_k} \sqrt{\frac{dQ_k}{dP_k}}\; dP_k \;\in\; (0,1].
+\rho_k = \int_{E_k} \sqrt{\frac{dQ_k}{dP_k}}\; dP_k
+= \int_{E_k} \sqrt{\frac{dQ_k}{d\mu_k}\cdot\frac{dP_k}{d\mu_k}}\; d\mu_k
+\;\in\; (0,1],
 \]
-Alors :
+(la seconde écriture, pour toute mesure dominante $\mu_k$, montre la symétrie
+en $(P_k, Q_k)$). Alors :
 \begin{enumerate}[label=(\Alph*)]
-\item si $\prod_k \rho_k > 0$, alors $Q \sim P$ (mesures équivalentes) ;
+\item si $\prod_k \rho_k > 0$, alors $Q \sim P$ (mesures équivalentes), avec
+      $\frac{dQ}{dP} = X_\infty$ où $X_\infty$ est la limite du processus de
+      densité ;
 \item si $\prod_k \rho_k = 0$, alors $Q \perp P$ (mesures étrangères).
 \end{enumerate}
 \end{theorem}
 
-\begin{proof}[Lien avec la version martingale]
-Travaillons sous $P$ et posons $\xi_k = \frac{dQ_k}{dP_k}(\omega_k)$, variables
-indépendantes, positives, d'espérance $1$ sous $P$. La martingale produit
-$X_n = \prod_{k \le n} \xi_k$ n'est autre que le processus de densité
+\begin{proof}
+Travaillons sous $P$, avec les coordonnées canoniques
+$\omega = (\omega_1, \omega_2, \dots)$, la filtration
+$\F_n = \sigma(\omega_1, \dots, \omega_n)$ et
 \[
-X_n = \frac{dQ}{dP}\bigg|_{\F_n},
-\qquad \F_n = \sigma(\omega_1, \dots, \omega_n),
+\xi_k(\omega) = \frac{dQ_k}{dP_k}(\omega_k).
 \]
-et $a_k = \E_P[\sqrt{\xi_k}] = \rho_k$. Dans le cas (A), la martingale est fermée
-par $X_\infty$ avec $\E_P[X_\infty]=1$ ; on vérifie alors que
-$dQ = X_\infty\, dP$ avec de plus $X_\infty > 0$ $P$-p.s.\ (appliquer le même
-argument en échangeant les rôles de $P$ et $Q$, licite car
-$\int \sqrt{dP_k/dQ_k}\,dQ_k = \rho_k$ également), d'où $Q \sim P$. Dans le cas
-(B), $X_\infty = 0$ $P$-p.s.\ tandis que, par symétrie, le processus de densité
-inverse tend vers $0$ $Q$-p.s. : les deux mesures se concentrent sur des
-événements disjoints, $Q \perp P$.
+Sous $P$, les $\xi_k$ sont indépendantes, strictement positives
+($P_k \sim Q_k$), d'espérance $\E_P[\xi_k] = \int \frac{dQ_k}{dP_k}\,dP_k = 1$,
+et $\E_P[\sqrt{\xi_k}] = \rho_k$. La martingale produit
+$X_n = \prod_{k\le n}\xi_k$ est le \emph{processus de densité} : pour tout
+$A \in \F_n$ (dépendant des $n$ premières coordonnées), le théorème de Fubini
+donne
+\[
+Q(A) = \E_P\bigl[X_n \ind_A\bigr],
+\qquad \text{i.e.} \qquad
+X_n = \frac{dQ}{dP}\bigg|_{\F_n}.
+\]
+
+\emph{Cas (A).} Par le théorème~\ref{thm:kakutani-mart}, $X_n \to X_\infty$
+dans $L^1(P)$ avec $X_\infty > 0$ $P$-p.s. Pour $A \in \F_n$ fixé, la
+convergence $L^1$ permet de passer à la limite :
+\[
+Q(A) = \lim_{m\to\infty}\E_P[X_m \ind_A] = \E_P[X_\infty \ind_A].
+\]
+Les deux mesures finies $Q$ et $X_\infty\,dP$ coïncident sur le $\pi$-système
+$\bigcup_n \F_n$ qui engendre la tribu produit ; par le lemme de classe
+monotone, $dQ = X_\infty\, dP$ sur toute la tribu produit. Comme $X_\infty > 0$
+$P$-p.s., les mesures sont équivalentes : $Q \sim P$.
+
+\emph{Cas (B).} Sous $P$, $X_\infty = 0$ p.s. Par symétrie de $\rho_k$,
+l'argument s'applique aussi sous $Q$ au processus de densité inverse
+$\widetilde{X}_n = \prod_{k \le n} \frac{dP_k}{dQ_k}(\omega_k) = 1/X_n$ : on a
+$\E_Q[\sqrt{\widetilde\xi_k}] = \int\sqrt{dP_k/dQ_k}\,dQ_k = \rho_k$, donc
+$\widetilde{X}_n \to 0$ $Q$-p.s., c'est-à-dire $X_n \to +\infty$ $Q$-p.s.
+L'événement asymptotique
+\[
+D = \Bigl\{\omega : \lim_n X_n(\omega) = 0\Bigr\}
+\]
+vérifie donc $P(D) = 1$ et $Q(D) = 0$ : les deux mesures se concentrent sur des
+événements disjoints ($D$ et $D^c$), soit $Q \perp P$.
 \end{proof}
 
-\begin{remark}
+\begin{remark}[Tout ou rien]
 Le contenu frappant du théorème est l'absence de décomposition de Lebesgue non
-triviale : bien que chaque facteur soit équivalent, une infinité de perturbations
-individuellement bénignes produit soit une équivalence globale, soit une
-singularité totale --- jamais un mélange.
+triviale : bien que chaque facteur soit équivalent, une infinité de
+perturbations individuellement bénignes produit soit une équivalence globale,
+soit une singularité totale --- jamais un mélange. La distance de Hellinger
+$H^2(P_k, Q_k) = \int(\sqrt{dP_k} - \sqrt{dQ_k})^2 = 2(1 - \rho_k)$ reformule
+le critère : équivalence si et seulement si $\sum_k H^2(P_k, Q_k) < \infty$.
 \end{remark}
 
 %=======================================================================
@@ -271,54 +863,95 @@ Soient $(Z_k)$ i.i.d.\ $\mathcal{N}(0,1)$, $(\sigma_k)$ une suite réelle, et
 X_n = \prod_{k=1}^n \xi_k
 = \exp\Bigl(\sum_{k=1}^n \sigma_k Z_k - \tfrac12 \sum_{k=1}^n \sigma_k^2\Bigr).
 \]
-La transformée de Laplace gaussienne $\E[e^{\lambda Z}] = e^{\lambda^2/2}$ donne
-$\E[\xi_k] = 1$ et
+\emph{Calculs exacts.} La transformée de Laplace gaussienne
+$\E[e^{\lambda Z}] = e^{\lambda^2/2}$ donne d'une part
+$\E[\xi_k] = e^{\sigma_k^2/2 - \sigma_k^2/2} = 1$ (martingale), d'autre part
 \[
 a_k = \E\bigl[\sqrt{\xi_k}\bigr]
-= \E\Bigl[e^{\frac{\sigma_k}{2} Z_k - \frac{\sigma_k^2}{4}}\Bigr]
-= e^{\frac{\sigma_k^2}{8} - \frac{\sigma_k^2}{4}}
+= \E\Bigl[e^{\frac{\sigma_k}{2} Z_k}\Bigr]\, e^{-\frac{\sigma_k^2}{4}}
+= e^{\frac{\sigma_k^2}{8}}\, e^{-\frac{\sigma_k^2}{4}}
 = e^{-\sigma_k^2/8}.
 \]
 La dichotomie se lit alors sur une condition de sommabilité :
 \[
-\prod_k a_k > 0
+\prod_k a_k = \exp\Bigl(-\tfrac18\textstyle\sum_k \sigma_k^2\Bigr) > 0
 \iff
 \boxed{\;\sum_{k\ge1} \sigma_k^2 < \infty.\;}
 \]
-\begin{itemize}
-\item Si $\sum_k \sigma_k^2 < \infty$ : $X_n \to X_\infty > 0$ p.s.,
-      $\E[X_\infty]=1$, la martingale est fermée.
-\item Si $\sum_k \sigma_k^2 = \infty$ (en particulier à $\sigma_k = \sigma > 0$
-      constant) : $X_\infty = 0$ p.s., alors que $\E[X_n] = 1$ pour tout $n$.
-      À $\sigma$ constant, la loi des grands nombres précise la vitesse :
-      $\frac1n \log X_n \to -\sigma^2/2$ p.s.
-\end{itemize}
+
+\emph{Régime convergent.} Si $\sum_k \sigma_k^2 < \infty$, la série
+$\sum_k \sigma_k Z_k$ converge p.s.\ et dans $L^2$ (série de variables
+indépendantes centrées de variances sommables, théorème des deux séries de
+Kolmogorov), donc
+\[
+X_\infty = \exp\Bigl(\sum_{k\ge1}\sigma_k Z_k
+- \tfrac12\sum_{k\ge1}\sigma_k^2\Bigr) > 0 \quad \ps,
+\qquad \E[X_\infty] = 1 :
+\]
+la martingale est fermée, de limite log-normale explicite.
+
+\emph{Régime dégénéré.} Si $\sum_k \sigma_k^2 = \infty$, alors $X_\infty = 0$
+p.s.\ bien que $\E[X_n] = 1$ pour tout $n$. À $\sigma_k = \sigma > 0$ constant,
+la loi des grands nombres précise la vitesse :
+\[
+\frac1n \log X_n = \sigma\,\frac{1}{n}\sum_{k=1}^n Z_k - \frac{\sigma^2}{2}
+\xrightarrow{\ps} -\frac{\sigma^2}{2} < 0,
+\]
+décroissance exponentielle p.s. L'espérance, elle, est portée par un événement
+de grande déviation : $X_n \ge 1$ exige
+$\bar{Z}_n := \frac1n\sum_{k\le n} Z_k \ge \sigma/2$, événement de probabilité
+\[
+\Prob\bigl(\bar{Z}_n \ge \sigma/2\bigr)
+= \Prob\bigl(\mathcal{N}(0,1) \ge \tfrac{\sigma}{2}\sqrt{n}\bigr)
+\sim \frac{e^{-n\sigma^2/8}}{\frac{\sigma}{2}\sqrt{2\pi n}},
+\]
+exponentiellement petit --- et le taux $\sigma^2/8$ est exactement
+$-\log a_k$ : la vitesse de Hellinger \emph{est} le taux de grande déviation de
+l'événement qui porte la masse. C'est ce mécanisme qui rend un estimateur de
+Monte-Carlo de $\E[X_n]$ inutilisable à $n$ grand : la masse fuit le long
+d'événements jamais échantillonnés.
 \end{example}
 
-\begin{corollary}[Cameron--Martin, cas discret]
-Sur $\R^{\N}$ muni des tribus produit,
+\begin{corollary}[Cameron--Martin, cas discret]\label{cor:CM}
+Sur $\R^{\N}$ muni de la tribu produit,
 \[
-\bigotimes_{k\ge1} \mathcal{N}(\theta_k, 1) \;\sim\; \bigotimes_{k\ge1} \mathcal{N}(0,1)
+\bigotimes_{k\ge1} \mathcal{N}(\theta_k, 1) \;\sim\; \bigotimes_{k\ge1}
+\mathcal{N}(0,1)
 \iff
 (\theta_k)_k \in \ell^2,
 \]
-et il y a singularité totale sinon.
+et il y a singularité totale ($\perp$) sinon. Dans le cas équivalent, la
+densité est
+\[
+\frac{d\bigotimes_k \mathcal{N}(\theta_k,1)}{d\bigotimes_k \mathcal{N}(0,1)}(x)
+= \exp\Bigl(\sum_{k\ge1}\theta_k x_k - \tfrac12\sum_{k\ge1}\theta_k^2\Bigr).
+\]
 \end{corollary}
 
 \begin{proof}
 La densité du facteur $k$ est
-$\frac{d\mathcal{N}(\theta_k,1)}{d\mathcal{N}(0,1)}(x) = e^{\theta_k x - \theta_k^2/2}$,
-soit exactement $\xi_k$ de l'exemple~\ref{ex:gauss} avec $\sigma_k = \theta_k$.
-La condition $\sum \theta_k^2 < \infty$ conclut par le
-théorème~\ref{thm:kakutani-mes}.
+\[
+\frac{d\mathcal{N}(\theta_k,1)}{d\mathcal{N}(0,1)}(x)
+= \frac{e^{-(x-\theta_k)^2/2}}{e^{-x^2/2}}
+= e^{\theta_k x - \theta_k^2/2},
+\]
+soit exactement le $\xi_k$ de l'exemple~\ref{ex:gauss} avec
+$\sigma_k = \theta_k$ et $Z_k = x_k$ sous la mesure de référence. Le calcul
+$\rho_k = e^{-\theta_k^2/8}$ et le théorème~\ref{thm:kakutani-mes} concluent :
+équivalence si et seulement si $\sum_k \theta_k^2 < \infty$. La formule de la
+densité est la limite $X_\infty$ du régime convergent.
 \end{proof}
 
 \begin{remark}
 C'est la version discrète du théorème de Cameron--Martin pour la mesure de
-Wiener : une translation du brownien par une fonction $h$ produit une mesure
-équivalente si et seulement si $h$ appartient à l'espace de Cameron--Martin
-(dérivée dans $L^2$), et une mesure étrangère sinon --- même mécanisme, même
-dichotomie.
+Wiener : la translation du brownien par une fonction $h$,
+$W \mapsto W + h$, produit une mesure équivalente si et seulement si $h$
+appartient à l'espace de Cameron--Martin $H^1 = \{h : h' \in L^2\}$, avec
+densité de Girsanov
+$\exp\bigl(\int_0^\infty h'\,dW - \frac12\int_0^\infty (h')^2\,dt\bigr)$, et
+une mesure étrangère sinon. En décomposant sur une base hilbertienne, on
+retrouve exactement le corollaire~\ref{cor:CM} : même mécanisme, même
+dichotomie, avec $\sum \theta_k^2$ remplacée par $\norm{h'}_{L^2}^2$.
 \end{remark}
 
 %=======================================================================
@@ -326,45 +959,64 @@ dichotomie.
 %=======================================================================
 
 \paragraph{Statistique asymptotique.}
-Soit à tester $H_0 : \text{les observations suivent } P$ contre
-$H_1 : \text{elles suivent } Q$, à partir de la suite infinie d'observations
-indépendantes. La dichotomie affirme que la discrimination parfaite est soit
-possible (cas singulier : le test $\{X_\infty = 0\}$ ne commet asymptotiquement
-aucune erreur), soit impossible même asymptotiquement (cas équivalent : aucun test
-consistant n'existe, les deux hypothèses restent \emph{contiguës}). L'affinité de
-Hellinger $\rho_k$, et la distance de Hellinger associée
-$H^2(P_k, Q_k) = 2(1 - \rho_k)$, sont ainsi les quantités naturelles de la théorie
-de la contiguïté de Le~Cam : la frontière $\sum_k H^2(P_k, Q_k) < \infty$ sépare
-exactement le détectable de l'indétectable.
+Soit à tester $H_0$ : les observations suivent $P$, contre $H_1$ : elles
+suivent $Q$, à partir de la suite infinie d'observations indépendantes. La
+dichotomie affirme que la discrimination parfaite est soit possible (cas
+singulier : le test de région critique $\{X_\infty = 0\}^c$, i.e.\ rejeter
+$H_0$ lorsque le rapport de vraisemblance ne tend pas vers $0$, ne commet
+asymptotiquement aucune erreur de première ni de seconde espèce), soit
+impossible même asymptotiquement (cas équivalent : aucun test consistant
+n'existe, les deux suites d'hypothèses restent \emph{contiguës} au sens de
+Le~Cam). L'affinité de Hellinger $\rho_k$ et la distance associée
+$H^2(P_k, Q_k) = 2(1 - \rho_k)$ sont ainsi les quantités naturelles de la
+théorie : la frontière $\sum_k H^2(P_k, Q_k) < \infty$ sépare exactement le
+détectable de l'indétectable. Dans le cas gaussien du
+corollaire~\ref{cor:CM}, cette frontière est le critère $\ell^2$ sur le signal
+$(\theta_k)$ --- forme primitive des seuils de détection en tests de signaux
+parcimonieux.
 
 \paragraph{Finance mathématique.}
 Le processus de densité d'un changement de mesure de Girsanov,
-$X_t = \exp\bigl(\int_0^t \theta_s\, dW_s - \frac12 \int_0^t \theta_s^2\, ds\bigr)$,
-est une martingale exponentielle du type de l'exemple~\ref{ex:gauss}. Sur horizon
-fini, la condition de Novikov
-$\E\bigl[e^{\frac12\int_0^T \theta_s^2 ds}\bigr] < \infty$ garantit qu'elle est une
-vraie martingale fermée et que la mesure risque-neutre existe. Sur horizon infini,
-c'est le mécanisme de Kakutani qui gouverne : si la \og prime de risque \fg{}
-cumulée $\int_0^\infty \theta_s^2\, ds$ diverge, le changement de mesure dégénère
-($X_\infty = 0$), et les mesures historique et risque-neutre deviennent étrangères
---- même mathématique que le cas discret, avec $\sum \sigma_k^2$ remplacée par
-l'intégrale.
+\[
+X_t = \exp\Bigl(\int_0^t \theta_s\, dW_s - \tfrac12 \int_0^t \theta_s^2\,
+ds\Bigr),
+\]
+est une martingale exponentielle du type de l'exemple~\ref{ex:gauss} (une
+martingale locale positive, donc une surmartingale, dont il faut vérifier
+qu'elle est une vraie martingale). Sur horizon fini $T$, la condition de
+Novikov $\E\bigl[e^{\frac12\int_0^T \theta_s^2\, ds}\bigr] < \infty$ garantit
+que $(X_t)_{t \le T}$ est une martingale UI fermée par $X_T$, et la mesure
+risque-neutre $dQ = X_T\, dP$ existe. Sur horizon infini, c'est le mécanisme de
+Kakutani qui gouverne : si la prime de risque cumulée
+$\int_0^\infty \theta_s^2\, ds$ diverge, le changement de mesure dégénère
+($X_\infty = 0$), et les mesures historique et risque-neutre deviennent
+étrangères --- même mathématique que le cas discret, avec $\sum_k \sigma_k^2$
+remplacée par l'intégrale. La stratégie de doublement de
+l'exemple~\ref{ex:doubling} est l'autre visage financier du défaut d'UI :
+c'est précisément pour l'exclure que la théorie de l'arbitrage impose des
+contraintes d'admissibilité (richesse minorée) aux stratégies.
 
 \paragraph{En résumé.}
-Le théorème de Doob garantit l'existence de la limite ; la dichotomie de Kakutani
-répond à la question que Doob laisse ouverte --- \emph{la limite conserve-t-elle la
-masse ?} --- et y répond de la manière la plus tranchée possible : tout ou rien,
-avec un critère exact, calculable facteur par facteur.
+Le théorème de Doob garantit l'existence de la limite ; l'uniforme
+intégrabilité est la condition exacte sous laquelle la martingale est \emph{ce
+qu'elle prétend être} --- l'espérance conditionnelle de sa variable terminale
+--- et sous laquelle les identités formelles ($\E[X_T] = \E[X_0]$, passage à la
+limite dans le conditionnement) deviennent licites ; la dichotomie de Kakutani
+répond à la question que Doob laisse ouverte --- \emph{la limite
+conserve-t-elle la masse ?} --- et y répond de la manière la plus tranchée
+possible : tout ou rien, avec un critère exact, calculable facteur par facteur.
 
 \begin{thebibliography}{9}
-\bibitem{kakutani} S.~Kakutani, \emph{On equivalence of infinite product measures},
-Annals of Mathematics \textbf{49} (1948), 214--224.
-\bibitem{williams} D.~Williams, \emph{Probability with Martingales},
-Cambridge University Press, 1991.
+\bibitem{kakutani} S.~Kakutani, \emph{On equivalence of infinite product
+measures}, Annals of Mathematics \textbf{49} (1948), 214--224.
+\bibitem{williams} D.~Williams, \emph{Probability with Martingales}, Cambridge
+University Press, 1991.
 \bibitem{durrett} R.~Durrett, \emph{Probability: Theory and Examples},
 5\textsuperscript{e} éd., Cambridge University Press, 2019.
-\bibitem{lecam} L.~Le~Cam, \emph{Asymptotic Methods in Statistical Decision Theory},
-Springer, 1986.
+\bibitem{lecam} L.~Le~Cam, \emph{Asymptotic Methods in Statistical Decision
+Theory}, Springer, 1986.
+\bibitem{revuzyor} D.~Revuz et M.~Yor, \emph{Continuous Martingales and
+Brownian Motion}, 3\textsuperscript{e} éd., Springer, 1999.
 \end{thebibliography}
 
 \end{document}

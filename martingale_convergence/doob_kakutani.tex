@@ -661,6 +661,63 @@ des valeurs divergentes --- de nouveau le mécanisme de fuite à l'infini.
 \subsection{Formulation martingale}
 %-----------------------------------------------------------------------
 
+Le critère de Kakutani s'exprime par un produit infini. Commençons par lever
+toute ambiguïté sur le sens de ce produit : pour des facteurs dans $(0,1]$, la
+limite des produits partiels existe \emph{toujours}, et la seule question est
+de savoir si elle est nulle ou strictement positive.
+
+\begin{lemma}[{Produits infinis de facteurs dans $(0,1]$}]\label{lem:prod-inf}
+Soit $(a_k)_{k\ge1}$ une suite de réels avec $0 < a_k \le 1$ pour tout $k$, et
+$\pi_n = \prod_{k=1}^{n} a_k$.
+\begin{enumerate}[label=(\roman*)]
+\item La suite $(\pi_n)$ converge toujours : décroissante et minorée par $0$,
+      elle admet une limite $\pi_\infty \in [0,1]$. C'est cette limite que
+      l'on note $\prod_{k\ge1} a_k$.
+\item On a l'équivalence
+\[
+\pi_\infty > 0
+\iff \sum_{k\ge1} (-\log a_k) < \infty
+\iff \sum_{k\ge1} (1 - a_k) < \infty.
+\]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(i) Chaque facteur étant dans $(0,1]$, la suite $(\pi_n)$ est décroissante,
+strictement positive, minorée par $0$ : elle converge vers
+$\pi_\infty \in [0,1]$. Aucune autre hypothèse n'est requise --- contrairement
+au cas de facteurs de signe quelconque, où l'existence de la limite est déjà
+un problème, la monotonie fait ici tout le travail. (Dans le vocabulaire
+classique des produits infinis, le cas $\pi_\infty = 0$ est appelé
+\emph{divergence vers $0$} ; nous n'utilisons pas cette convention et parlons
+simplement de la valeur de la limite.)
+
+(ii) \emph{Première équivalence.} Comme $a_k > 0$, on peut écrire
+$\log \pi_n = \sum_{k\le n} \log a_k$, somme décroissante de termes $\le 0$ ;
+elle est minorée si et seulement si $\sum_k(-\log a_k) < \infty$, et
+$\pi_\infty = \exp\bigl(-\sum_k(-\log a_k)\bigr) > 0$ exactement dans ce cas.
+
+\emph{Seconde équivalence.} On utilise deux inégalités élémentaires, toutes
+deux issues de $\log x \le x - 1$ :
+\[
+1 - x \le -\log x \quad (x \in (0,1]),
+\qquad\qquad
+-\log x = \log\frac1x \le \frac1x - 1 = \frac{1-x}{x} \le 2(1-x)
+\quad (x \in [\tfrac12, 1]).
+\]
+Si $\sum_k(-\log a_k) < \infty$, la première inégalité donne
+$\sum_k(1-a_k) < \infty$. Réciproquement, si $\sum_k (1-a_k) < \infty$, alors
+$1 - a_k \to 0$, donc $a_k \ge \tfrac12$ à partir d'un rang $k_0$ ; la seconde
+inégalité donne
+$\sum_{k \ge k_0}(-\log a_k) \le 2\sum_{k\ge k_0}(1-a_k) < \infty$, et les
+termes d'indice $< k_0$, en nombre fini, ne changent rien.
+
+Enfin, si $a_k \not\to 1$ (cas où aucune des deux séries ne converge), la
+conclusion $\pi_\infty = 0$ se voit aussi directement : il existe $\delta > 0$
+et une infinité d'indices $k$ avec $a_k \le 1 - \delta$, d'où
+$\pi_n \le (1-\delta)^{N_n}$ avec $N_n \to \infty$.
+\end{proof}
+
 \begin{theorem}[Kakutani, 1948 --- version martingale]\label{thm:kakutani-mart}
 Soit $(\xi_k)_{k \ge 1}$ une suite de variables aléatoires indépendantes,
 positives, d'espérance $\E[\xi_k] = 1$, et soit
@@ -668,8 +725,10 @@ positives, d'espérance $\E[\xi_k] = 1$, et soit
 X_n = \prod_{k=1}^{n} \xi_k, \qquad X_0 = 1,
 \]
 la martingale produit associée. On pose
-$a_k = \E\bigl[\sqrt{\xi_k}\bigr] \in (0,1]$. Alors exactement l'une des deux
-situations suivantes se produit :
+$a_k = \E\bigl[\sqrt{\xi_k}\bigr] \in (0,1]$ ; d'après le
+lemme~\ref{lem:prod-inf}, le produit $\prod_{k\ge1} a_k$, entendu comme limite
+des produits partiels, existe toujours dans $[0,1]$. Alors exactement l'une des
+deux situations suivantes se produit :
 \begin{enumerate}[label=(\Alph*)]
 \item $\displaystyle\prod_{k\ge 1} a_k > 0$
       \emph{(de manière équivalente : $\sum_k (1-a_k) < \infty$)} :
@@ -681,15 +740,15 @@ situations suivantes se produit :
 \end{theorem}
 
 \begin{remark}
-(a) L'inégalité $a_k \le 1$ résulte de Cauchy--Schwarz :
+(a) Vérifions que $a_k \in (0,1]$, ce qui rend le lemme~\ref{lem:prod-inf}
+applicable et donne un sens inconditionnel au produit $\prod_k a_k$.
+La majoration $a_k \le 1$ résulte de Cauchy--Schwarz :
 $\E[\sqrt{\xi_k}] \le \sqrt{\E[\xi_k]} = 1$, avec égalité si et seulement si
-$\xi_k = 1$ p.s.
+$\xi_k = 1$ p.s. La minoration $a_k > 0$ vient de ce que $\E[\xi_k] = 1$
+impose $\Prob(\xi_k > 0) > 0$, donc $\E[\sqrt{\xi_k}] > 0$.
 
-(b) L'équivalence entre $\prod_k a_k > 0$ et $\sum_k (1 - a_k) < \infty$ est le
-critère classique des produits infinis : comme $a_k \in (0,1]$,
-$\prod_k a_k > 0 \iff \sum_k (-\log a_k) < \infty$, et
-$-\log a_k \sim 1 - a_k$ lorsque $a_k \to 1$ (si $a_k \not\to 1$, les deux
-conditions échouent simultanément).
+(b) L'équivalence entre $\prod_k a_k > 0$ et $\sum_k (1 - a_k) < \infty$ est
+exactement le point (ii) du lemme~\ref{lem:prod-inf}.
 
 (c) Le produit $\prod_k a_k$ mesure l'accumulation des perturbations : chaque
 facteur non trivial coûte strictement, et la question est de savoir si le coût

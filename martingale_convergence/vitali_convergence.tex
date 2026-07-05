@@ -1,0 +1,528 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue!60!black, urlcolor=blue!60!black}
+
+% ------------------------------------------------------------------
+% Environnements de théorèmes
+% ------------------------------------------------------------------
+\newtheorem{theorem}{Théorème}[section]
+\newtheorem{lemma}{Lemme}
+\renewcommand{\thelemma}{\Alph{lemma}}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollaire}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Définition}
+\newtheorem{example}[theorem]{Exemple}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remarque}
+
+% ------------------------------------------------------------------
+% Notations
+% ------------------------------------------------------------------
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Hf}{\mathcal{H}}
+\newcommand{\ind}[1]{\mathbf{1}_{#1}}
+\newcommand{\convP}{\xrightarrow{\ \PP\ }}
+\newcommand{\convLone}{\xrightarrow{\ L^1\ }}
+\newcommand{\convps}{\xrightarrow{\ \text{p.s.}\ }}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+\title{Théorème de convergence de Vitali\\[0.3em]
+\large Équivalence entre convergence $L^1$ et uniforme intégrabilité\\
+sous convergence en probabilité}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Soit $(X_n)_{n\ge 1}$ une suite de variables aléatoires intégrables convergeant en
+probabilité vers $X$. Nous démontrons en détail l'équivalence entre la convergence
+dans $L^1$ et l'uniforme intégrabilité de la famille $(X_n)$, en établissant au
+préalable tous les lemmes intermédiaires : intégrabilité uniforme d'une variable
+seule, caractérisation $(\varepsilon,\delta)$, familles finies, extraction de
+sous-suites presque sûres. Nous analysons ensuite le contre-exemple canonique et
+donnons quelques compléments (lemme de Scheffé, critère de La Vallée Poussin).
+\end{abstract}
+
+\tableofcontents
+
+% ==================================================================
+\section{Cadre et définitions}
+% ==================================================================
+
+On fixe un espace probabilisé $(\Omega, \F, \PP)$. Toutes les variables aléatoires
+considérées sont réelles et définies sur cet espace.
+
+\begin{definition}[Uniforme intégrabilité]\label{def:UI}
+Une famille $\Hf \subset L^1(\Omega,\F,\PP)$ est dite \emph{uniformément intégrable}
+(UI) si
+\[
+\lim_{K \to \infty} \; \sup_{Y \in \Hf} \E\big[\abs{Y}\,\ind{\{\abs{Y} > K\}}\big] = 0.
+\]
+\end{definition}
+
+\begin{definition}[Convergence en probabilité]
+On dit que $X_n \convP X$ si pour tout $\eta > 0$,
+$\PP(\abs{X_n - X} > \eta) \to 0$ lorsque $n \to \infty$.
+\end{definition}
+
+L'objet de ce document est le théorème suivant.
+
+\begin{theorem}[Vitali]\label{thm:vitali}
+Soit $(X_n)_{n \ge 1} \subset L^1$ telle que $X_n \convP X$. Alors :
+\[
+(X_n)_{n\ge 1} \text{ est uniformément intégrable}
+\iff
+X \in L^1 \ \text{ et } \ X_n \convLone X.
+\]
+\end{theorem}
+
+% ==================================================================
+\section{Lemmes préliminaires}
+% ==================================================================
+
+\begin{lemma}[Une variable intégrable seule est UI]\label{lem:A}
+Si $Y \in L^1$, alors
+$\E\big[\abs{Y}\,\ind{\{\abs{Y} > K\}}\big] \xrightarrow[K \to \infty]{} 0$.
+\end{lemma}
+
+\begin{proof}
+Posons $Z_K := \abs{Y}\,\ind{\{\abs{Y} > K\}}$. Pour $\omega$ fixé : puisque
+$Y \in L^1$, on a $\abs{Y(\omega)} < \infty$ presque sûrement, et dès que
+$K > \abs{Y(\omega)}$ on obtient $Z_K(\omega) = 0$. Ainsi $Z_K \to 0$ p.s.
+lorsque $K \to \infty$. De plus $0 \le Z_K \le \abs{Y}$ avec $\abs{Y} \in L^1$.
+Le théorème de convergence dominée donne $\E[Z_K] \to 0$.
+
+On peut préciser : $K \mapsto Z_K$ est décroissante en $K$ (les ensembles
+$\{\abs{Y} > K\}$ décroissent), de sorte que la convergence est monotone ; on
+peut donc aussi invoquer le théorème de Beppo Levi appliqué à
+$\abs{Y} - Z_K \nearrow \abs{Y}$.
+\end{proof}
+
+\begin{lemma}[Caractérisation $(\varepsilon,\delta)$ de l'UI]\label{lem:B}
+Une famille $\Hf \subset L^1$ est UI si et seulement si les deux conditions
+suivantes sont satisfaites :
+\begin{enumerate}[label=(\alph*)]
+\item \emph{(bornitude $L^1$)} \quad
+$M := \displaystyle\sup_{Y \in \Hf} \E\abs{Y} < \infty$ ;
+\item \emph{(équi-absolue continuité)} \quad pour tout $\varepsilon > 0$, il
+existe $\delta > 0$ tel que
+\[
+\forall A \in \F, \quad \PP(A) < \delta
+\;\Longrightarrow\;
+\sup_{Y \in \Hf} \E\big[\abs{Y}\,\ind{A}\big] \le \varepsilon.
+\]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\emph{Sens direct : UI $\Rightarrow$ (a) $+$ (b).}
+Soit $\varepsilon > 0$. Par uniforme intégrabilité, il existe $K_0 > 0$ tel que
+\begin{equation}\label{eq:UI-K0}
+\sup_{Y \in \Hf} \E\big[\abs{Y}\,\ind{\{\abs{Y} > K_0\}}\big] \le \frac{\varepsilon}{2}.
+\end{equation}
+
+\emph{Preuve de (a).} Pour tout $Y \in \Hf$, en découpant
+$\Omega = \{\abs{Y} \le K_0\} \sqcup \{\abs{Y} > K_0\}$ :
+\[
+\E\abs{Y}
+= \E\big[\abs{Y}\,\ind{\{\abs{Y} \le K_0\}}\big]
++ \E\big[\abs{Y}\,\ind{\{\abs{Y} > K_0\}}\big]
+\le K_0 + \frac{\varepsilon}{2} < \infty .
+\]
+
+\emph{Preuve de (b).} Posons $\delta := \varepsilon / (2K_0)$. Si
+$\PP(A) < \delta$, alors pour tout $Y \in \Hf$, en découpant
+$A = \big(A \cap \{\abs{Y} \le K_0\}\big) \sqcup \big(A \cap \{\abs{Y} > K_0\}\big)$ :
+\[
+\E\big[\abs{Y}\,\ind{A}\big]
+\le K_0\,\PP(A) + \E\big[\abs{Y}\,\ind{\{\abs{Y} > K_0\}}\big]
+\le K_0 \cdot \frac{\varepsilon}{2K_0} + \frac{\varepsilon}{2}
+= \varepsilon .
+\]
+
+\emph{Sens réciproque : (a) $+$ (b) $\Rightarrow$ UI.}
+Soit $\varepsilon > 0$ et soit $\delta > 0$ le module fourni par (b).
+Par l'inégalité de Markov, pour tout $Y \in \Hf$ et tout $K > 0$ :
+\[
+\PP(\abs{Y} > K) \le \frac{\E\abs{Y}}{K} \le \frac{M}{K}.
+\]
+Choisissons $K > M/\delta$ : alors $\PP(\abs{Y} > K) \le M/K < \delta$ pour
+\emph{tout} $Y \in \Hf$ simultanément --- c'est ici que la bornitude uniforme (a)
+est indispensable. En appliquant (b) à l'événement $A_Y := \{\abs{Y} > K\}$
+(qui dépend de $Y$, mais $\delta$ n'en dépend pas), on obtient
+\[
+\E\big[\abs{Y}\,\ind{\{\abs{Y} > K\}}\big] \le \varepsilon
+\qquad \forall\, Y \in \Hf ,
+\]
+d'où $\sup_{Y \in \Hf} \E\big[\abs{Y}\ind{\{\abs{Y}>K\}}\big] \le \varepsilon$
+pour tout $K > M/\delta$. C'est exactement la Définition~\ref{def:UI}.
+\end{proof}
+
+\begin{remark}[Indépendance logique de (a) et (b)]
+Les deux conditions sont logiquement indépendantes. Sur un espace probabilisé
+\emph{atomique fini} (par exemple $\Omega = \{\omega_1,\dots,\omega_m\}$ avec
+$\PP(\{\omega_j\}) = p_j > 0$), posons $p_0 := \min_j p_j > 0$ et considérons la
+famille des constantes $Y_n \equiv n$. Tout événement $A$ avec
+$\PP(A) < p_0$ est nécessairement vide, donc (b) est satisfaite de façon vide
+avec $\delta < p_0$ ; en revanche (a) échoue puisque $\E\abs{Y_n} = n$, et la
+famille n'est pas UI. Inversement, le contre-exemple de la
+section~\ref{sec:contre-exemple} vérifie (a) mais pas (b).
+\end{remark}
+
+\begin{lemma}[Une famille finie de variables $L^1$ est UI]\label{lem:C}
+Si $Y_1, \dots, Y_m \in L^1$, alors la famille $\{Y_1, \dots, Y_m\}$ est UI.
+\end{lemma}
+
+\begin{proof}
+Par le Lemme~\ref{lem:A}, pour chaque $k \in \{1,\dots,m\}$ on a
+$\E\big[\abs{Y_k}\ind{\{\abs{Y_k}>K\}}\big] \to 0$ quand $K \to \infty$. Donc
+\[
+\sup_{1 \le k \le m} \E\big[\abs{Y_k}\,\ind{\{\abs{Y_k} > K\}}\big]
+= \max_{1 \le k \le m} \E\big[\abs{Y_k}\,\ind{\{\abs{Y_k} > K\}}\big]
+\xrightarrow[K \to \infty]{} 0,
+\]
+car un maximum d'un nombre \emph{fini} de suites tendant vers $0$ tend vers $0$.
+C'est précisément là que la finitude est cruciale : l'énoncé est faux pour un
+supremum sur une famille infinie.
+\end{proof}
+
+\begin{lemma}[Extraction d'une sous-suite presque sûre]\label{lem:D}
+Si $X_n \convP X$, il existe une sous-suite $(n_k)_{k \ge 1}$ strictement
+croissante telle que $X_{n_k} \convps X$.
+\end{lemma}
+
+\begin{proof}
+Pour chaque $k \ge 1$, puisque $\PP(\abs{X_n - X} > 2^{-k}) \to 0$ quand
+$n \to \infty$, on peut choisir $n_k > n_{k-1}$ (avec $n_0 := 0$) tel que
+\[
+\PP\big(\abs{X_{n_k} - X} > 2^{-k}\big) \le 2^{-k}.
+\]
+Alors $\sum_{k \ge 1} \PP\big(\abs{X_{n_k} - X} > 2^{-k}\big)
+\le \sum_{k \ge 1} 2^{-k} < \infty$, et par le lemme de Borel--Cantelli
+(première partie),
+\[
+\PP\Big(\limsup_{k \to \infty} \big\{\abs{X_{n_k} - X} > 2^{-k}\big\}\Big) = 0.
+\]
+Autrement dit, presque sûrement, il existe $k_0(\omega)$ tel que
+$\abs{X_{n_k}(\omega) - X(\omega)} \le 2^{-k}$ pour tout $k \ge k_0(\omega)$,
+ce qui entraîne $X_{n_k}(\omega) \to X(\omega)$.
+\end{proof}
+
+% ==================================================================
+\section{Sens direct : UI $\Rightarrow$ convergence $L^1$}
+% ==================================================================
+
+Dans toute cette section, on suppose que $(X_n) \subset L^1$ est UI et que
+$X_n \convP X$.
+
+\subsection{Étape 1 : intégrabilité de la limite}
+
+Par le Lemme~\ref{lem:D}, il existe une sous-suite telle que
+$X_{n_k} \to X$ p.s., donc $\abs{X_{n_k}} \to \abs{X}$ p.s. Le lemme de Fatou
+(applicable car $\abs{X_{n_k}} \ge 0$) donne :
+\[
+\E\abs{X}
+= \E\Big[\liminf_{k \to \infty} \abs{X_{n_k}}\Big]
+\le \liminf_{k \to \infty} \E\abs{X_{n_k}}
+\le \sup_{n} \E\abs{X_n} =: M < \infty,
+\]
+où $M < \infty$ résulte du Lemme~\ref{lem:B}, point (a). Donc $X \in L^1$, et en
+particulier $\E\abs{X_n - X} \le \E\abs{X_n} + \E\abs{X} < \infty$ : la quantité
+que l'on veut faire tendre vers $0$ est bien définie.
+
+\subsection{Étape 2 : propriétés de la troncature}
+
+Pour $K > 0$, définissons $\varphi_K : \R \to [-K, K]$ par
+\[
+\varphi_K(x) := \max\big(-K, \min(x, K)\big) = (x \wedge K) \vee (-K).
+\]
+
+\begin{enumerate}[label=(\roman*)]
+\item \emph{$\varphi_K$ est $1$-lipschitzienne.} En effet, $\varphi_K$ coïncide
+avec l'identité sur $[-K,K]$ et est constante ailleurs ; formellement, pour
+$x \ge y$ :
+\[
+\varphi_K(x) - \varphi_K(y) = \int_y^x \ind{[-K,K]}(t)\, \mathrm{d}t
+\quad\Longrightarrow\quad
+\abs{\varphi_K(x) - \varphi_K(y)} \le \abs{x - y}.
+\]
+\item \emph{Erreur de troncature.} Pour tout $x \in \R$ :
+\begin{equation}\label{eq:tronc}
+\abs{x - \varphi_K(x)} = (\abs{x} - K)^+ \le \abs{x}\,\ind{\{\abs{x} > K\}}.
+\end{equation}
+Vérification : si $\abs{x} \le K$, les deux premiers membres valent $0$ et
+l'inégalité est triviale. Si $\abs{x} > K$, alors
+$\abs{x - \varphi_K(x)} = \abs{x} - K \le \abs{x} = \abs{x}\,\ind{\{\abs{x}>K\}}$.
+\end{enumerate}
+
+\subsection{Étape 3 : décomposition en trois termes}
+
+Par inégalité triangulaire :
+\begin{equation}\label{eq:decomp}
+\E\abs{X_n - X}
+\;\le\;
+\underbrace{\E\big|X_n - \varphi_K(X_n)\big|}_{(\mathrm{I}_n)}
+\;+\;
+\underbrace{\E\big|\varphi_K(X_n) - \varphi_K(X)\big|}_{(\mathrm{II}_n)}
+\;+\;
+\underbrace{\E\big|\varphi_K(X) - X\big|}_{(\mathrm{III})}.
+\end{equation}
+
+Fixons $\varepsilon > 0$.
+
+\paragraph{Contrôle de $(\mathrm{I}_n)$, uniforme en $n$.}
+Par \eqref{eq:tronc} puis par uniforme intégrabilité, il existe $K_1$ tel que
+pour tout $K \ge K_1$ :
+\[
+(\mathrm{I}_n)
+\le \E\big[\abs{X_n}\,\ind{\{\abs{X_n} > K\}}\big]
+\le \sup_{m} \E\big[\abs{X_m}\,\ind{\{\abs{X_m} > K\}}\big]
+\le \varepsilon
+\qquad \forall\, n \ge 1.
+\]
+
+\paragraph{Contrôle de $(\mathrm{III})$.}
+Par \eqref{eq:tronc},
+$(\mathrm{III}) \le \E\big[\abs{X}\,\ind{\{\abs{X} > K\}}\big]$. Comme
+$X \in L^1$ (Étape~1), le Lemme~\ref{lem:A} fournit $K_2$ tel que
+$(\mathrm{III}) \le \varepsilon$ pour tout $K \ge K_2$.
+
+\medskip
+\noindent
+\textbf{On fixe désormais $K := \max(K_1, K_2)$.} Les deux termes extrêmes de
+\eqref{eq:decomp} sont $\le \varepsilon$, uniformément en $n$.
+
+\paragraph{Contrôle de $(\mathrm{II}_n)$ à $K$ fixé.}
+Posons $D_n := \abs{\varphi_K(X_n) - \varphi_K(X)}$. Deux faits :
+\begin{itemize}
+\item $0 \le D_n \le 2K$, car $\varphi_K$ est à valeurs dans $[-K, K]$ ;
+\item $D_n \le \abs{X_n - X}$ par le point (i), donc pour tout $\eta > 0$ :
+\begin{equation}\label{eq:inclusion}
+\{D_n > \eta\} \subseteq \{\abs{X_n - X} > \eta\}
+\quad\Longrightarrow\quad
+\PP(D_n > \eta) \le \PP(\abs{X_n - X} > \eta).
+\end{equation}
+\end{itemize}
+On découpe alors $\Omega = \{D_n \le \eta\} \sqcup \{D_n > \eta\}$ :
+\[
+(\mathrm{II}_n)
+= \E\big[D_n \ind{\{D_n \le \eta\}}\big] + \E\big[D_n \ind{\{D_n > \eta\}}\big]
+\le \eta + 2K\,\PP(D_n > \eta)
+\overset{\eqref{eq:inclusion}}{\le} \eta + 2K\,\PP(\abs{X_n - X} > \eta).
+\]
+Comme $X_n \convP X$ et que $K$ est \emph{fixé},
+$2K\,\PP(\abs{X_n - X} > \eta) \to 0$ quand $n \to \infty$, donc
+\[
+\limsup_{n \to \infty} (\mathrm{II}_n) \le \eta.
+\]
+
+\subsection{Étape 4 : conclusion}
+
+En passant à la limite supérieure dans \eqref{eq:decomp} :
+\[
+\limsup_{n \to \infty} \E\abs{X_n - X}
+\le \varepsilon + \eta + \varepsilon
+= 2\varepsilon + \eta.
+\]
+Ceci vaut pour tous $\varepsilon > 0$ et $\eta > 0$. En faisant
+$\eta \downarrow 0$ puis $\varepsilon \downarrow 0$ :
+\[
+\lim_{n \to \infty} \E\abs{X_n - X} = 0. \qquad \qed
+\]
+
+\begin{remark}[Ordre des quantificateurs]
+Le point de logique crucial est l'ordre des choix. On choisit $K$ en fonction de
+$\varepsilon$ \emph{avant} de faire tendre $n \to \infty$ ; le terme
+$(\mathrm{II}_n)$ contient le facteur $2K$, qui exploserait si l'on faisait
+$K \to \infty$ en premier. La preuve fonctionne parce que $K$ reste fixe pendant
+la limite en $n$, puis on ne touche plus à $K$ : l'optimisation en $\eta$ et
+$\varepsilon$ n'intervient qu'à la fin, sur des quantités où $n$ a déjà disparu.
+\end{remark}
+
+% ==================================================================
+\section{Sens réciproque : convergence $L^1$ $\Rightarrow$ UI}
+% ==================================================================
+
+On suppose maintenant $X \in L^1$ et $X_n \convLone X$.
+
+\begin{remark}
+La convergence $L^1$ implique la convergence en probabilité par l'inégalité de
+Markov : $\PP(\abs{X_n - X} > \eta) \le \eta^{-1}\,\E\abs{X_n - X} \to 0$.
+L'hypothèse de convergence en probabilité est donc automatiquement satisfaite
+dans ce sens de l'équivalence.
+\end{remark}
+
+Soit $\varepsilon > 0$. Par convergence $L^1$, il existe $N \in \N$ tel que
+\begin{equation}\label{eq:L1-N}
+\E\abs{X_n - X} < \frac{\varepsilon}{2} \qquad \forall\, n > N.
+\end{equation}
+
+\subsection{Vérification de (a) : bornitude $L^1$}
+
+Pour $n > N$ :
+$\E\abs{X_n} \le \E\abs{X_n - X} + \E\abs{X} \le \frac{\varepsilon}{2} + \E\abs{X}$.
+Donc
+\[
+M := \sup_{n \ge 1} \E\abs{X_n}
+\le \max\Big(\E\abs{X_1}, \dots, \E\abs{X_N},\; \E\abs{X} + \tfrac{\varepsilon}{2}\Big)
+< \infty,
+\]
+chaque terme du maximum étant fini puisque $X_n, X \in L^1$.
+
+\subsection{Vérification de (b) : équi-absolue continuité}
+
+La famille \emph{finie} $\{X_1, \dots, X_N, X\}$ est UI par le
+Lemme~\ref{lem:C}, donc vérifie (b) par le Lemme~\ref{lem:B} : il existe
+$\delta > 0$ tel que
+\begin{equation}\label{eq:finie-delta}
+\PP(A) < \delta
+\;\Longrightarrow\;
+\E\big[\abs{X_k}\,\ind{A}\big] < \frac{\varepsilon}{2} \ \ (1 \le k \le N)
+\quad\text{et}\quad
+\E\big[\abs{X}\,\ind{A}\big] < \frac{\varepsilon}{2}.
+\end{equation}
+
+Soit $A \in \F$ avec $\PP(A) < \delta$. On distingue deux cas.
+
+\begin{itemize}
+\item \textbf{Cas $n \le N$.} Directement par \eqref{eq:finie-delta} :
+$\E\big[\abs{X_n}\ind{A}\big] < \varepsilon/2 \le \varepsilon$.
+\item \textbf{Cas $n > N$.} On écrit $\abs{X_n} \le \abs{X_n - X} + \abs{X}$,
+d'où, en majorant $\ind{A} \le 1$ dans le premier terme :
+\[
+\E\big[\abs{X_n}\,\ind{A}\big]
+\le \E\big[\abs{X_n - X}\,\ind{A}\big] + \E\big[\abs{X}\,\ind{A}\big]
+\le \E\abs{X_n - X} + \E\big[\abs{X}\,\ind{A}\big]
+\overset{\eqref{eq:L1-N},\,\eqref{eq:finie-delta}}{<}
+\frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon.
+\]
+\end{itemize}
+
+Donc $\sup_n \E\big[\abs{X_n}\ind{A}\big] \le \varepsilon$ dès que
+$\PP(A) < \delta$ : c'est la condition (b).
+
+\subsection{Conclusion}
+
+Les conditions (a) et (b) étant vérifiées, le Lemme~\ref{lem:B} (sens
+réciproque, via l'inégalité de Markov avec $K > M/\delta$) donne l'uniforme
+intégrabilité de $(X_n)_{n \ge 1}$. \qed
+
+% ==================================================================
+\section{Anatomie du contre-exemple canonique}\label{sec:contre-exemple}
+% ==================================================================
+
+L'uniforme intégrabilité est \emph{exactement} la bonne condition : sans elle,
+la convergence en probabilité (et même presque sûre) ne suffit pas.
+
+\begin{example}
+Sur $\big([0,1], \mathcal{B}([0,1]), \mathrm{Leb}\big)$, posons
+\[
+X_n := n\,\ind{[0,\, 1/n]}, \qquad X := 0.
+\]
+
+\begin{itemize}
+\item \emph{Convergence presque sûre.} Pour $\omega > 0$ fixé,
+$X_n(\omega) = 0$ dès que $n > 1/\omega$ ; l'ensemble exceptionnel $\{0\}$ est
+Lebesgue-négligeable.
+\item \emph{Pas de convergence $L^1$.}
+$\E\abs{X_n - 0} = n \cdot \frac{1}{n} = 1 \not\to 0$.
+\item \emph{Échec quantitatif de l'UI.} Pour $K$ fixé et $n > K$, l'événement
+$\{\abs{X_n} > K\}$ coïncide avec $[0, 1/n]$ (puisque $n > K$), donc
+\[
+\E\big[\abs{X_n}\,\ind{\{\abs{X_n} > K\}}\big] = n \cdot \frac{1}{n} = 1,
+\]
+d'où $\sup_n \E\big[\abs{X_n}\ind{\{\abs{X_n}>K\}}\big] = 1$ pour \emph{tout}
+$K$ : la limite en $K$ vaut $1 \ne 0$.
+\end{itemize}
+
+Notons que la condition (a) est vérifiée ($\E\abs{X_n} = 1$ pour tout $n$) :
+c'est (b) qui échoue. Avec $A_n := [0, 1/n]$, on a $\PP(A_n) \to 0$ mais
+$\E\big[\abs{X_n}\ind{A_n}\big] = 1$. La masse unité se concentre sur des
+ensembles de mesure arbitrairement petite --- c'est précisément le phénomène de
+\emph{fuite de masse} (vers l'infini vertical) que l'uniforme intégrabilité
+interdit. Le lemme de Fatou donne alors seulement
+$\E\abs{X} = 0 \le \liminf_n \E\abs{X_n} = 1$, avec inégalité stricte : la
+limite a « perdu » de la masse.
+\end{example}
+
+% ==================================================================
+\section{Compléments}
+% ==================================================================
+
+Les outils développés ci-dessus donnent presque immédiatement les résultats
+suivants.
+
+\begin{proposition}[Lemme de Scheffé, version probabiliste]
+Supposons $X_n \convP X$ avec $X_n, X \in L^1$. Si $\E\abs{X_n} \to \E\abs{X}$,
+alors $X_n \convLone X$.
+\end{proposition}
+
+\begin{proof}[Esquisse de preuve]
+Posons $Y_n := \abs{X_n} + \abs{X} - \abs{X_n - X} \ge 0$ (positivité par
+inégalité triangulaire). On a $Y_n \convP 2\abs{X}$, et une version du lemme de
+Fatou pour la convergence en probabilité (obtenue par le principe des
+sous-sous-suites via le Lemme~\ref{lem:D}) donne
+\[
+2\,\E\abs{X} \le \liminf_{n} \E[Y_n]
+= 2\,\E\abs{X} - \limsup_{n} \E\abs{X_n - X},
+\]
+en utilisant l'hypothèse $\E\abs{X_n} \to \E\abs{X}$. D'où
+$\limsup_n \E\abs{X_n - X} \le 0$, c'est-à-dire la convergence $L^1$.
+\end{proof}
+
+\begin{proposition}[Critère de La Vallée Poussin]
+Une famille $\Hf \subset L^1$ est UI si et seulement s'il existe une fonction
+$G : \R_+ \to \R_+$ croissante telle que $G(t)/t \to \infty$ quand
+$t \to \infty$ et
+\[
+\sup_{Y \in \Hf} \E\big[G(\abs{Y})\big] < \infty.
+\]
+\end{proposition}
+
+\begin{proof}[Preuve du sens facile ($\Leftarrow$)]
+Pour $K > 0$, sur l'événement $\{\abs{Y} > K\}$ on a
+$\abs{Y} \le \dfrac{\abs{Y}}{G(\abs{Y})} \, G(\abs{Y})
+\le \Big(\sup_{t > K} \dfrac{t}{G(t)}\Big) G(\abs{Y})$, d'où
+\[
+\E\big[\abs{Y}\,\ind{\{\abs{Y} > K\}}\big]
+\le \Big(\sup_{t > K} \frac{t}{G(t)}\Big) \cdot \E\big[G(\abs{Y})\big],
+\]
+et le facteur $\sup_{t > K} t/G(t)$ tend vers $0$ quand $K \to \infty$ par
+hypothèse de surlinéarité, uniformément en $Y \in \Hf$.
+\end{proof}
+
+\begin{corollary}[Bornitude $L^p$, $p > 1$]
+Si $\sup_{Y \in \Hf} \E\big[\abs{Y}^p\big] < \infty$ pour un $p > 1$, alors
+$\Hf$ est UI (prendre $G(t) = t^p$). C'est le critère le plus utilisé en
+pratique, notamment pour les martingales bornées dans $L^p$.
+\end{corollary}
+
+\begin{remark}[Martingales fermées]
+Un exemple fondamental de famille UI : si $Z \in L^1$ et $(\F_n)$ est une
+filtration, la martingale $M_n := \E[Z \mid \F_n]$ est UI. La preuve utilise
+exactement le Lemme~\ref{lem:B} : par Jensen conditionnel,
+$\abs{M_n} \le \E[\abs{Z} \mid \F_n]$, puis pour $A \in \F$ quelconque de petite
+probabilité on contrôle $\E[\abs{M_n}\ind{A}]$ via l'équi-absolue continuité de
+la variable seule $Z$ (Lemme~\ref{lem:A} $+$ Lemme~\ref{lem:B}). Combiné au
+théorème de Vitali et au théorème de convergence des martingales, ceci fournit
+la caractérisation des martingales fermées.
+\end{remark}
+
+\end{document}

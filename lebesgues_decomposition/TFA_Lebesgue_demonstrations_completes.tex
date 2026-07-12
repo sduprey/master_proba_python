@@ -1,0 +1,1165 @@
+\documentclass[11pt]{article}
+
+% ---------- Encodage / langue / polices ----------
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{french}
+\usepackage{microtype}
+
+% ---------- Mathématiques ----------
+\usepackage{amsmath,amssymb,amsthm,mathtools,stmaryrd}
+\usepackage{mathrsfs}
+
+% ---------- Mise en page ----------
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[colorlinks=true,linkcolor=NavyBlue,citecolor=NavyBlue,urlcolor=NavyBlue]{hyperref}
+
+% ---------- Couleurs ----------
+\definecolor{NavyBlue}{RGB}{27,60,120}
+\definecolor{ForestGreen}{RGB}{20,120,60}
+\definecolor{Crimson}{RGB}{160,30,45}
+\definecolor{BoxBlue}{RGB}{232,238,248}
+
+% ---------- Styles de théorèmes ----------
+\newtheoremstyle{thmblue}{10pt}{10pt}{\itshape}{}{\bfseries\color{NavyBlue}}{.}{.5em}{}
+\newtheoremstyle{defplain}{10pt}{10pt}{}{}{\bfseries\color{ForestGreen}}{.}{.5em}{}
+\newtheoremstyle{rem}{8pt}{8pt}{}{}{\itshape}{.}{.5em}{}
+
+\theoremstyle{thmblue}
+\newtheorem{theoreme}{Théorème}[section]
+\newtheorem{proposition}[theoreme]{Proposition}
+\newtheorem{lemme}[theoreme]{Lemme}
+\newtheorem{corollaire}[theoreme]{Corollaire}
+
+\theoremstyle{defplain}
+\newtheorem{definition}[theoreme]{Définition}
+\newtheorem{exemple}[theoreme]{Exemple}
+\newtheorem{contreexemple}[theoreme]{Contre-exemple}
+
+\theoremstyle{rem}
+\newtheorem{remarque}[theoreme]{Remarque}
+\newtheorem{notation}[theoreme]{Notation}
+
+\renewcommand{\proofname}{\normalfont\bfseries D\'emonstration}
+
+% ---------- Macros ----------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\dx}{\,dx}
+\newcommand{\dt}{\,dt}
+\newcommand{\du}{\,du}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\pp}{p.\,p.}
+\DeclareMathOperator{\Lip}{Lip}
+\DeclareMathOperator{\osc}{osc}
+\DeclareMathOperator{\diam}{diam}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\lstar}{\lambda^{\!*}}
+
+\newcommand{\keybox}[2]{%
+\begin{center}
+\fcolorbox{NavyBlue}{BoxBlue}{\parbox{0.95\linewidth}{\textbf{#1}\\[2pt] #2}}
+\end{center}}
+
+\title{\vspace{-1.2cm}\bfseries\color{NavyBlue}\Large Le théorème fondamental de l'analyse\\[4pt]
+\large de Riemann à Lebesgue}
+\author{\normalsize Généralisations, contre-exemples et l'escalier de Cantor}
+\date{\normalsize\today}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+\noindent
+On retrace la généralisation progressive du théorème fondamental de l'analyse (TFA), de sa forme
+riemannienne classique jusqu'à sa formulation optimale dans le cadre de Lebesgue, puis au-delà. Le
+fil conducteur est une série de \emph{contre-exemples} délimitant la frontière de validité de chaque
+énoncé : la fonction de Volterra, puis \emph{l'escalier de Cantor}, enfin $x^2\sin(1/x^2)$. Toutes les
+démonstrations sont données \emph{intégralement} et s'appuient sur une unique boîte à outils --- le
+lemme de recouvrement de Vitali et les théorèmes de convergence de l'intégration de Lebesgue
+(Fatou, convergence dominée) --- que l'on suppose connus. Aucun résultat n'est renvoyé à une annexe.
+\end{abstract}
+
+\tableofcontents
+\vspace{0.4cm}
+
+% ============================================================
+\section{Introduction et boîte à outils}
+% ============================================================
+
+Sous sa forme scolaire, le TFA énonce, pour $f$ continue,
+\[
+\frac{d}{dx}\int_a^x f(t)\dt = f(x)
+\qquad\text{et}\qquad
+\int_a^b F'(t)\dt = F(b)-F(a)\quad(F'=f).
+\]
+Dès qu'on relâche la continuité, chacun de ces deux volets se fissure. La question centrale est :
+
+\begin{center}
+\emph{pour quelles fonctions $F$ a-t-on encore $\displaystyle\int_a^b F' = F(b)-F(a)$ ?}
+\end{center}
+
+La réponse, on le verra, est \emph{exactement} : les fonctions \emph{absolument continues}.
+L'escalier de Cantor --- continu, croissant, de dérivée nulle presque partout, mais croissant de $0$
+à $1$ --- est le témoin qui interdit toute réponse plus laxiste.
+
+\paragraph{Conventions.} On travaille sur un segment $[a,b]$. La lettre $\lambda$ désigne la mesure de
+Lebesgue et $\lstar$ la mesure extérieure ; « \pp » signifie « pour $\lambda$-presque tout $x$ ».
+On note $L^1=L^1([a,b])$ l'espace des fonctions Lebesgue-intégrables. On suppose acquis, du côté de
+l'\emph{intégration} : la construction de l'intégrale de Lebesgue et de la tribu des ensembles
+mesurables, le lemme de Fatou, les théorèmes de convergence monotone et dominée. Du côté de la
+\emph{mesure}, on ne suppose que la définition de $\lambda$ sur les mesurables ; les propriétés de la
+mesure extérieure $\lstar$ dont on se sert (sous-additivité, régularité extérieure, continuité
+croissante) sont rappelées et démontrées au §\ref{sub:mesext} ci-dessous.
+
+\medskip
+Les démonstrations « fines » reposent sur deux ingrédients géométriques : les propriétés de la mesure
+extérieure, puis un lemme de recouvrement. On les établit dans cet ordre.
+
+\subsection{Rappel : la mesure extérieure de Lebesgue}\label{sub:mesext}
+
+\begin{definition}[mesure extérieure]
+Pour $E\subset\R$, la \emph{mesure extérieure de Lebesgue} est
+\[
+\lstar(E)=\inf\Bigl\{\sum_{n\ge1}\ell(I_n)\ :\ E\subset\bigcup_{n\ge1}I_n,\ I_n\text{ intervalles ouverts}\Bigr\},
+\]
+où $\ell(]c,d[)=d-c$. C'est un infimum sur tous les recouvrements dénombrables de $E$ par des
+intervalles ouverts.
+\end{definition}
+
+De la définition découlent immédiatement la \emph{positivité} ($\lstar\ge0$, $\lstar(\varnothing)=0$),
+la \emph{monotonie} ($E\subset E'\Rightarrow\lstar(E)\le\lstar(E')$, tout recouvrement de $E'$ en étant
+un de $E$) et l'\emph{invariance par translation}. On admet le fait de base
+$\lstar([c,d])=\lstar(]c,d[)=d-c$ (l'inégalité $\le$ est immédiate ; l'inégalité $\ge$ résulte, pour un
+recouvrement d'un segment, de la compacité de Borel--Lebesgue). Trois propriétés servent constamment.
+
+\begin{proposition}[sous-additivité dénombrable]\label{prop:sousadd}
+Pour toute suite $(A_n)$ de parties de $\R$,
+\[
+\lstar\Bigl(\bigcup_n A_n\Bigr)\le\sum_n\lstar(A_n).
+\]
+\end{proposition}
+
+\begin{proof}
+Si un $\lstar(A_n)=\infty$, le membre de droite est infini et il n'y a rien à montrer. Sinon, fixons
+$\eps>0$. Par définition de l'infimum, pour chaque $n$ il existe des intervalles ouverts
+$(I_{n,j})_j$ recouvrant $A_n$ avec $\sum_j\ell(I_{n,j})<\lstar(A_n)+\eps\,2^{-n}$. La famille
+dénombrable $(I_{n,j})_{n,j}$ recouvre $\bigcup_n A_n$, d'où
+\[
+\lstar\Bigl(\bigcup_n A_n\Bigr)\le\sum_{n,j}\ell(I_{n,j})<\sum_n\bigl(\lstar(A_n)+\eps\,2^{-n}\bigr)
+=\sum_n\lstar(A_n)+\eps.
+\]
+On fait $\eps\to0$.
+\end{proof}
+
+\begin{proposition}[régularité extérieure]\label{prop:regext}
+Pour tout $E\subset\R$ et tout $\eps>0$, il existe un ouvert $O\supset E$ tel que
+$\lambda(O)\le\lstar(E)+\eps$. En particulier $\lstar(E)=\inf\{\lambda(O):O\text{ ouvert},\ O\supset E\}$.
+\end{proposition}
+
+\begin{proof}
+Si $\lstar(E)=\infty$, prendre $O=\R$. Sinon, par définition de l'infimum, il existe des intervalles
+ouverts $(I_n)$ recouvrant $E$ avec $\sum_n\ell(I_n)<\lstar(E)+\eps$. L'ensemble $O=\bigcup_n I_n$ est
+ouvert, contient $E$, et par sous-additivité (proposition~\ref{prop:sousadd})
+\[
+\lambda(O)=\lstar(O)\le\sum_n\lstar(I_n)=\sum_n\ell(I_n)<\lstar(E)+\eps.\qedhere
+\]
+\end{proof}
+
+\begin{corollaire}[enveloppe mesurable]\label{cor:enveloppe}
+Tout $A\subset\R$ possède une \emph{enveloppe mesurable} : un ensemble mesurable (même de type
+$G_\delta$) $H\supset A$ tel que $\lambda(H)=\lstar(A)$.
+\end{corollaire}
+
+\begin{proof}
+Par la proposition~\ref{prop:regext}, choisissons pour chaque $n\ge1$ un ouvert $O_n\supset A$ avec
+$\lambda(O_n)\le\lstar(A)+\tfrac1n$. Alors $H=\bigcap_n O_n$ est un $G_\delta$ (donc mesurable),
+$A\subset H$, et pour tout $n$ : $\lstar(A)\le\lambda(H)\le\lambda(O_n)\le\lstar(A)+\tfrac1n$. En
+faisant $n\to\infty$, $\lambda(H)=\lstar(A)$.
+\end{proof}
+
+\begin{proposition}[continuité croissante de $\lstar$]\label{prop:contcroiss}
+Si $E_1\subset E_2\subset\cdots$ et $E=\bigcup_n E_n$, alors $\lstar(E)=\lim_n\lstar(E_n)$.
+\end{proposition}
+
+\begin{proof}
+La suite $\bigl(\lstar(E_n)\bigr)$ est croissante (monotonie), et $\lstar(E)\ge\lstar(E_n)$ pour tout
+$n$, donc $\lstar(E)\ge\lim_n\lstar(E_n)$. Pour l'inégalité inverse, prenons pour chaque $n$ une
+enveloppe mesurable $H_n\supset E_n$ avec $\lambda(H_n)=\lstar(E_n)$
+(corollaire~\ref{cor:enveloppe}), puis posons $G_n=\bigcap_{k\ge n}H_k$. Chaque $G_n$ est mesurable ;
+comme $E_n\subset E_k\subset H_k$ pour $k\ge n$, on a $E_n\subset G_n$, d'où
+$\lstar(E_n)\le\lambda(G_n)\le\lambda(H_n)=\lstar(E_n)$, soit $\lambda(G_n)=\lstar(E_n)$. La suite
+$(G_n)$ est croissante et $G:=\bigcup_n G_n\supset\bigcup_n E_n=E$. Par continuité croissante de la
+mesure $\lambda$ sur les ensembles mesurables (additivité dénombrable),
+\[
+\lstar(E)\le\lambda(G)=\lim_n\lambda(G_n)=\lim_n\lstar(E_n).\qedhere
+\]
+\end{proof}
+
+\begin{remarque}[ensembles mesurables]
+Rappelons qu'un ensemble $E$ est \emph{Lebesgue-mesurable} (au sens de Carathéodory) si
+$\lstar(T)=\lstar(T\cap E)+\lstar(T\setminus E)$ pour tout $T\subset\R$. Les mesurables forment une
+tribu contenant les ouverts (donc les boréliens), sur laquelle $\lstar$ est \emph{dénombrablement
+additive} ; sa restriction est la mesure de Lebesgue $\lambda$, complète. Sur un mesurable,
+$\lambda=\lstar$ : c'est pourquoi on écrit $\lambda$ dès que l'argument porte sur un ouvert ou un
+ensemble mesurable, et $\lstar$ quand on manipule un ensemble a priori quelconque (typiquement les
+ensembles $E_{s,r}$ de la preuve du théorème~\ref{thm:mono}, dont on montre justement qu'ils sont
+négligeables).
+\end{remarque}
+
+\keybox{Mode d'emploi : $\lambda$ ou $\lstar$ ?}{%
+Devant un ensemble, une seule question : \emph{le sait-on mesurable ?}
+\\[3pt]
+$\bullet$~\textbf{Oui} (intervalle, ouvert, fermé, borélien, ou construit à partir d'eux par
+opérations dénombrables) : on écrit $\lambda$, et l'on a le droit de \emph{découper et sommer}
+(additivité dénombrable). C'est le régime des ouverts $O,U$ et des intervalles $I_k$, là où l'on veut
+des \emph{égalités} de longueurs comme $\lambda(O)=\sum_n\ell(I_n)$.
+\\[3pt]
+$\bullet$~\textbf{Non} / ensemble a priori quelconque / \emph{image directe} $H(A)$ / ensemble que l'on
+cherche justement à déclarer négligeable (les $E_{s,r}$) : seul $\lstar$ est défini, avec les seules
+règles \emph{faibles} --- monotonie, sous-additivité, régularité, continuité croissante --- donc au
+mieux des \emph{inégalités}.
+\\[5pt]
+\textbf{Le pont (complétude).} Dès qu'on a établi $\lstar(E)=0$, l'ensemble \emph{devient} mesurable
+et $\lambda$ prend le relais :
+\[
+\lstar(E)=0\ \Longrightarrow\ E\ \text{mesurable}\ \Longrightarrow\ \lambda(E)=0.
+\]
+Chaque démonstration « fine » suit ce mouvement : partir de $\lstar$ sur un ensemble suspect, montrer
+qu'il est nul, puis basculer sans douleur dans le monde de $\lambda$ --- indolore car $\lambda=\lstar$
+sur les mesurables.}
+
+\subsection{Le lemme de recouvrement de Vitali}
+
+\begin{definition}[Recouvrement de Vitali]
+Soit $E\subset\R$. Une famille $\mathcal V$ d'intervalles fermés de longueur $>0$ \emph{recouvre $E$
+au sens de Vitali} si, pour tout $x\in E$ et tout $\rho>0$, il existe $I\in\mathcal V$ tel que
+$x\in I$ et $0<\lambda(I)<\rho$.
+\end{definition}
+
+\begin{lemme}[Vitali]\label{lem:vitali}
+Soit $E\subset\R$ avec $\lstar(E)<\infty$, et $\mathcal V$ un recouvrement de $E$ au sens de Vitali.
+Pour tout $\eps>0$, il existe une famille \emph{finie} d'intervalles \emph{deux à deux disjoints}
+$I_1,\dots,I_N\in\mathcal V$ tels que
+\[
+\lstar\!\Bigl(E\setminus\bigcup_{k=1}^{N} I_k\Bigr)<\eps.
+\]
+\end{lemme}
+
+\begin{proof}
+Par régularité extérieure (proposition~\ref{prop:regext}), fixons un ouvert $O\supset E$ avec $\lambda(O)<\infty$. Quitte à ne garder
+que les $I\in\mathcal V$ inclus dans $O$ (ce qui reste un recouvrement de Vitali de $E$, car les
+intervalles peuvent être pris arbitrairement petits autour de chaque point de $E\subset O$ ouvert),
+on suppose $I\subset O$ pour tout $I\in\mathcal V$.
+
+On construit une suite disjointe par sélection gloutonne. Choisissons $I_1\in\mathcal V$ quelconque.
+Supposons $I_1,\dots,I_n$ choisis, deux à deux disjoints. Si $E\subset\bigcup_{k\le n}I_k$, on
+s'arrête et le résultat est acquis. Sinon, posons
+\[
+s_n=\sup\{\lambda(I):I\in\mathcal V,\ I\cap I_k=\varnothing\ \forall k\le n\}.
+\]
+L'ensemble est non vide (un point $x\in E\setminus\bigcup_{k\le n}I_k$, qui est ouvert, admet de
+petits $I\in\mathcal V$ disjoints des $I_k$), et $s_n\le\lambda(O)<\infty$. Choisissons
+$I_{n+1}\in\mathcal V$ disjoint des précédents avec $\lambda(I_{n+1})>s_n/2$.
+
+Si le procédé ne s'arrête pas, on obtient une suite infinie $(I_k)$ deux à deux disjointes incluses
+dans $O$, donc $\sum_k\lambda(I_k)\le\lambda(O)<\infty$ ; en particulier $\lambda(I_k)\to0$ et le
+reste $\sum_{k>N}\lambda(I_k)\to0$.
+
+\emph{Estimation du reste.} Montrons : pour tout $N$,
+$\displaystyle E\setminus\bigcup_{k\le N}I_k\subset\bigcup_{k>N}5I_k$, où $5I_k$ désigne l'intervalle
+de même centre que $I_k$ et de longueur $5\lambda(I_k)$. Soit
+$x\in E\setminus\bigcup_{k\le N}I_k$. Comme $\bigcup_{k\le N}I_k$ est fermé et ne contient pas $x$,
+il existe $I\in\mathcal V$ avec $x\in I$, disjoint de $I_1,\dots,I_N$. Cet $I$ doit rencontrer l'un
+des $I_k$ ($k>N$) : sinon $I$ serait éligible à toutes les étapes, d'où
+$\lambda(I)\le s_n<2\lambda(I_{n+1})\to0$, contredisant $\lambda(I)>0$ fixe. Soit $k$ le plus petit
+indice tel que $I\cap I_k\neq\varnothing$ ; alors $k>N$ et $I$ est disjoint de $I_1,\dots,I_{k-1}$,
+donc $\lambda(I)\le s_{k-1}<2\lambda(I_k)$. Comme $I$ rencontre $I_k$ et que
+$\lambda(I)<2\lambda(I_k)$, tout point de $I$ est à distance $<\lambda(I)<2\lambda(I_k)$ d'un point de
+$I_k$ : donc $I\subset 5I_k$, et en particulier $x\in5I_k$.
+
+Ainsi $\lstar\bigl(E\setminus\bigcup_{k\le N}I_k\bigr)\le\sum_{k>N}5\lambda(I_k)\xrightarrow[N\to\infty]{}0$.
+On choisit $N$ rendant ce reste $<\eps$.
+\end{proof}
+
+Ce lemme, et les théorèmes de convergence de Lebesgue, suffisent à tout démontrer dans ce texte.
+
+\keybox{Feuille de route}{%
+Mesure extérieure $\to$ Vitali $\to$ dérivabilité \pp{} des fonctions monotones $\to$ escalier de Cantor $\to$ variation
+bornée \& continuité absolue $\to$ lemme d'image \& lemme de rigidité $\to$ les deux volets du TFA de
+Lebesgue $\to$ décomposition d'une fonction $BV$ $\to$ intégrale de Henstock--Kurzweil.}
+
+% ============================================================
+\section{Le théorème fondamental classique, et sa première fissure}
+% ============================================================
+
+\begin{theoreme}[TFA classique]\label{thm:classique}
+Soit $f:[a,b]\to\R$ continue.
+\begin{enumerate}[label=\textup{(\alph*)},leftmargin=2.2em,itemsep=1pt]
+  \item La fonction $F(x)=\int_a^x f(t)\dt$ est de classe $C^1$, et $F'=f$.
+  \item Si $G'=f$ partout, alors $\int_a^b f(t)\dt = G(b)-G(a)$.
+\end{enumerate}
+\end{theoreme}
+
+\begin{proof}
+(a) Soit $x_0\in[a,b]$ et $\eps>0$. La continuité de $f$ en $x_0$ fournit $\delta>0$ tel que
+$\abs{f(t)-f(x_0)}<\eps$ pour $\abs{t-x_0}<\delta$. Pour $0<\abs h<\delta$,
+\[
+\abs*{\frac{F(x_0+h)-F(x_0)}{h}-f(x_0)}
+=\abs*{\frac1h\int_{x_0}^{x_0+h}\!\bigl(f(t)-f(x_0)\bigr)\dt}
+\le\frac1{\abs h}\,\abs h\,\eps=\eps,
+\]
+donc $F'(x_0)=f(x_0)$ ; $F'=f$ est continue, d'où $F\in C^1$. (b) $G-F$ a une dérivée nulle sur
+l'intervalle $[a,b]$, donc est constante (théorème des accroissements finis) ; en évaluant en $a$ et
+$b$ on obtient $G(b)-G(a)=F(b)-F(a)=\int_a^b f$.
+\end{proof}
+
+Peut-on affaiblir (b) en supposant seulement $G$ \emph{dérivable partout, de dérivée bornée} ? Dans le
+cadre de Riemann, non.
+
+\begin{contreexemple}[Volterra, 1881]\label{ce:volterra}
+Il existe $V:[0,1]\to\R$ dérivable en tout point, à dérivée $V'$ bornée, telle que $V'$ n'est
+\emph{pas Riemann-intégrable}. On part d'un ensemble de Cantor \emph{gras} $K^\sharp$, de mesure
+$\lambda(K^\sharp)>0$, obtenu en retirant à chaque étape des intervalles centraux de longueurs
+sommables $<1$. Sur chaque intervalle contigu $]a_j,b_j[$ on greffe une copie tronquée de
+$g(x)=x^2\sin(1/x)$ (dérivable, dérivée bornée, oscillant infiniment près des bords), recollée pour
+que $V$ soit dérivable jusqu'aux extrémités avec $V'=0$ sur $K^\sharp$. En chaque point de $K^\sharp$,
+$V'$ oscille et est discontinue ; l'ensemble des discontinuités de $V'$ contient $K^\sharp$, donc est
+de mesure $>0$. Le critère de Lebesgue (une fonction bornée est Riemann-intégrable si et seulement si
+l'ensemble de ses discontinuités est négligeable) montre que $V'$ n'est pas Riemann-intégrable.
+\end{contreexemple}
+
+\keybox{Diagnostic}{%
+L'intégrale de Riemann est trop étroite : l'énoncé « $G$ dérivable $\Rightarrow\int G'=G(b)-G(a)$ »
+n'a pas toujours de sens, faute d'intégrabilité de $G'$. Il faut une intégrale plus robuste --- celle
+de Lebesgue --- dont le premier acquis est un puissant théorème de différentiation.}
+
+% ============================================================
+\section{Dérivabilité presque partout des fonctions monotones}
+% ============================================================
+
+Pour une fonction $f$ quelconque, on introduit les quatre \emph{dérivées de Dini}
+\[
+D^{+}f(x)=\limsup_{h\to0^+}\frac{f(x+h)-f(x)}{h},\quad
+D_{+}f(x)=\liminf_{h\to0^+}\frac{f(x+h)-f(x)}{h},
+\]
+et de même $D^{-}f,D_{-}f$ pour $h\to0^-$. La fonction $f$ est dérivable en $x$ (au sens fini) si et
+seulement si ces quatre nombres coïncident et sont finis.
+
+\begin{theoreme}[Lebesgue, 1904]\label{thm:mono}
+Soit $f:[a,b]\to\R$ croissante. Alors $f$ est dérivable \pp, sa dérivée $f'$ est mesurable, positive,
+et
+\[
+\int_a^b f'(x)\dx\ \le\ f(b)-f(a).
+\]
+\end{theoreme}
+
+\begin{proof}
+\emph{Étape 1 : $f$ est dérivable \pp.} Il suffit de montrer que, presque partout, les quatre dérivées
+de Dini coïncident et $D^{+}f<\infty$. Par un argument symétrique (appliqué à $x\mapsto-f(-x)$), il
+suffit de traiter l'inégalité $D^{+}f\le D_{-}f$ \pp{} (l'inégalité inverse $D_{-}f\le D^{+}f$ étant
+toujours plus facile ; en la combinant à ses analogues on obtient l'égalité des quatre). Fixons deux
+rationnels $0<s<r$ et posons
+\[
+E_{s,r}=\{x\in(a,b):D_{-}f(x)<s<r<D^{+}f(x)\}.
+\]
+L'ensemble où $D^{+}f>D_{-}f$ est la réunion \emph{dénombrable} $\bigcup_{s<r}E_{s,r}$ ; il suffit
+donc de prouver $\lstar(E_{s,r})=0$. Notons $\alpha=\lstar(E_{s,r})$ et fixons $\eps>0$. Par
+régularité extérieure (proposition~\ref{prop:regext}), soit $O\supset E_{s,r}$ ouvert avec
+$\lambda(O)<\alpha+\eps$.
+
+Pour $x\in E_{s,r}$, l'inégalité $D_{-}f(x)<s$ fournit des $h>0$ arbitrairement petits tels que
+$[x-h,x]\subset O$ et $f(x)-f(x-h)<s\,h$. Ces intervalles forment un recouvrement de Vitali de
+$E_{s,r}$ ; par le lemme~\ref{lem:vitali}, on en extrait une famille finie disjointe
+$[x_i-h_i,x_i]$, $i=1,\dots,p$, telle que $\lstar\bigl(E_{s,r}\cap\bigcup_i(x_i-h_i,x_i)\bigr)>\alpha-\eps$.
+En sommant,
+\begin{equation}\label{eq:mono1}
+\sum_{i=1}^{p}\bigl(f(x_i)-f(x_i-h_i)\bigr)<s\sum_{i=1}^{p}h_i\le s\,\lambda(O)<s(\alpha+\eps).
+\end{equation}
+Posons $A=E_{s,r}\cap\bigcup_i(x_i-h_i,x_i)$, de sorte que $\lstar(A)>\alpha-\eps$. Pour $y\in A$,
+l'inégalité $D^{+}f(y)>r$ fournit des $k>0$ arbitrairement petits tels que $[y,y+k]$ soit inclus dans
+l'un des intervalles ouverts $(x_i-h_i,x_i)$ et $f(y+k)-f(y)>r\,k$. Nouveau recouvrement de Vitali de
+$A$, nouvelle extraction finie disjointe $[y_j,y_j+k_j]$, $j=1,\dots,q$, avec
+$\sum_j k_j>\lstar(A)-\eps>\alpha-2\eps$. En sommant,
+\begin{equation}\label{eq:mono2}
+\sum_{j=1}^{q}\bigl(f(y_j+k_j)-f(y_j)\bigr)>r\sum_{j=1}^{q}k_j>r(\alpha-2\eps).
+\end{equation}
+Chaque $[y_j,y_j+k_j]$ est contenu dans un $(x_i-h_i,x_i)$ ; comme $f$ est croissante, la somme des
+accroissements de $f$ sur les $[y_j,y_j+k_j]$ contenus dans un même $(x_i-h_i,x_i)$ est majorée par
+l'accroissement $f(x_i)-f(x_i-h_i)$. En regroupant,
+\[
+\sum_{j=1}^{q}\bigl(f(y_j+k_j)-f(y_j)\bigr)\ \le\ \sum_{i=1}^{p}\bigl(f(x_i)-f(x_i-h_i)\bigr).
+\]
+Combinée à \eqref{eq:mono1} et \eqref{eq:mono2}, cela donne $r(\alpha-2\eps)<s(\alpha+\eps)$. En
+faisant $\eps\to0$ : $r\alpha\le s\alpha$, soit $(r-s)\alpha\le0$. Comme $r>s$, on a $\alpha=0$.
+Ainsi $D^{+}f=D_{-}f$ \pp, et $f$ est dérivable \pp.
+
+\emph{Étape 2 : intégrabilité et inégalité.} Prolongeons $f$ par $f(x)=f(b)$ pour $x>b$ et posons
+$g_n(x)=n\bigl(f(x+\tfrac1n)-f(x)\bigr)\ge0$. Les $g_n$ sont mesurables (comme $f$ croissante l'est)
+et $g_n\to f'$ \pp. Par le lemme de Fatou,
+\[
+\int_a^b f'\ \le\ \liminf_n\int_a^b g_n
+= \liminf_n\ n\!\int_a^b\!\bigl(f(x+\tfrac1n)-f(x)\bigr)\dx
+= \liminf_n\Bigl[n\!\int_b^{b+\frac1n}\!\!f - n\!\int_a^{a+\frac1n}\!\!f\Bigr].
+\]
+Or $n\int_b^{b+1/n}f=f(b)$ (car $f\equiv f(b)$ au-delà de $b$) et
+$n\int_a^{a+1/n}f\ge f(a)$ (car $f\ge f(a)$ sur $[a,a+1/n]$). Donc
+$\int_a^b f'\le f(b)-f(a)<\infty$. En particulier $f'<\infty$ \pp.
+\end{proof}
+
+\begin{remarque}[le point crucial]\label{rem:strict}
+L'inégalité peut être \emph{strictement} inférieure. Une fonction croissante peut « gagner de la
+hauteur » sans que sa dérivée en rende compte. Le cas d'égalité est exactement ce que le TFA de
+Lebesgue caractérisera ; l'escalier de Cantor réalise l'extrême opposé : $\int_0^1 f'=0$ pour
+$f(1)-f(0)=1$.
+\end{remarque}
+
+% ============================================================
+\section{L'escalier de Cantor}
+% ============================================================
+
+\subsection{L'ensemble triadique et sa mesure}
+
+\begin{definition}
+$K_0=[0,1]$ ; $K_{n+1}$ s'obtient en retirant le tiers ouvert central de chacun des $2^n$ intervalles
+de $K_n$. L'\emph{ensemble de Cantor} est $K=\bigcap_{n\ge0}K_n$.
+\end{definition}
+
+\begin{center}
+\begin{tikzpicture}[y=0pt,x=12cm]
+  \foreach \lvl/\segs in {%
+     0/{0/1},
+     1/{0/0.3333, 0.6667/1},
+     2/{0/0.1111,0.2222/0.3333,0.6667/0.7778,0.8889/1},
+     3/{0/0.0370,0.0741/0.1111,0.2222/0.2593,0.2963/0.3333,0.6667/0.7037,0.7407/0.7778,0.8889/0.9259,0.9630/1},
+     4/{0/0.0123,0.0247/0.0370,0.0741/0.0864,0.0988/0.1111,0.2222/0.2346,0.2469/0.2593,0.2963/0.3086,0.3210/0.3333,0.6667/0.6790,0.6914/0.7037,0.7407/0.7531,0.7654/0.7778,0.8889/0.9012,0.9136/0.9259,0.9630/0.9753,0.9877/1}%
+  }{
+    \foreach \s/\e in \segs {\draw[line width=3pt, NavyBlue] (\s,{-15*\lvl}) -- (\e,{-15*\lvl});}
+    \node[left] at (-0.02,{-15*\lvl}) {\scriptsize $K_{\lvl}$};
+  }
+\end{tikzpicture}
+\end{center}
+
+\noindent
+$K$ est compact, d'intérieur vide (il ne contient aucun intervalle), non dénombrable (les points de
+$K$ sont les réels admettant un développement triadique n'utilisant que les chiffres $0$ et $2$, en
+bijection avec $\{0,2\}^{\N}$). La longueur retirée vaut
+$\sum_{n\ge0}2^n\cdot3^{-(n+1)}=\tfrac13\sum_{n\ge0}(2/3)^n=1$, donc $\lambda(K)=0$. Le complémentaire
+$[0,1]\setminus K$ est une réunion dénombrable d'intervalles ouverts disjoints, de mesure totale $1$.
+
+\subsection{Construction et propriétés de la fonction}
+
+\begin{definition}\label{def:cantor}
+Pour $x=\sum_{i\ge1}a_i3^{-i}$ ($a_i\in\{0,1,2\}$), soit $N$ le plus petit indice avec $a_N=1$
+($N=\infty$ sinon). On pose $b_i=a_i/2$ pour $i<N$, $b_N=1$, $b_i=0$ pour $i>N$, et
+\[
+c(x)=\sum_{i\ge1}b_i\,2^{-i}.
+\]
+De manière équivalente : $c$ est \emph{constante} sur chaque intervalle contigu de $K$, égale à la
+valeur commune à ses extrémités ; sur $K$, on remplace chaque chiffre triadique $0$ ou $2$ par le
+chiffre binaire $0$ ou $1$.
+\end{definition}
+
+Concrètement $c=\tfrac12$ sur $[\tfrac13,\tfrac23]$, $c=\tfrac14$ sur $[\tfrac19,\tfrac29]$,
+$c=\tfrac34$ sur $[\tfrac79,\tfrac89]$, etc.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[x=8cm,y=5cm]
+  \draw[->,gray!70] (-0.02,0) -- (1.06,0) node[right]{\scriptsize $x$};
+  \draw[->,gray!70] (0,-0.02) -- (0,1.08) node[above]{\scriptsize $c(x)$};
+  \foreach \t in {0,0.3333,0.6667,1} \draw[gray!40] (\t,0)--(\t,-0.012) node[below]{\scriptsize $\t$};
+  \foreach \h/\lab in {0/0,0.5/{1/2},1/1} \draw[gray!40] (0,\h)--(-0.012,\h) node[left]{\scriptsize $\lab$};
+  \draw[dashed,gray!50] (0,1)--(1,1);
+  \input{cantor_coords.tex}
+\end{tikzpicture}
+\caption{L'escalier de Cantor : continu, croissant, constant sur chaque « marche » (intervalle
+contigu de $K$), donc $c'=0$ \pp, et pourtant $c(0)=0$, $c(1)=1$.}
+\label{fig:cantor}
+\end{figure}
+
+\begin{proposition}\label{prop:cantor}
+La fonction $c$ vérifie :
+\begin{enumerate}[label=\textup{(\alph*)},leftmargin=2.2em,itemsep=1pt]
+  \item $c$ est croissante, $c(0)=0$, $c(1)=1$, et $c$ est \emph{surjective} sur $[0,1]$ ;
+  \item $c$ est \emph{continue} ;
+  \item $c'(x)=0$ pour tout $x\in[0,1]\setminus K$, donc pour presque tout $x$, et
+  $\displaystyle\int_0^1 c'(x)\dx=0\neq1=c(1)-c(0)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(a) \emph{Croissance.} Soient $x<y$ dans $[0,1]$. Choisissons leurs développements triadiques
+« propres ». Si $x<y$, au premier rang $i_0$ où leurs chiffres diffèrent, on a $a_{i_0}(x)<a_{i_0}(y)$.
+L'application chiffre à chiffre $a\mapsto b$ de la définition~\ref{def:cantor} est croissante et,
+au rang $i_0$, donne $b_{i_0}(x)\le b_{i_0}(y)$, l'égalité n'ayant lieu que si un $a=1$ intervient ;
+un examen des cas (en tenant compte de la troncature au premier chiffre $1$) montre dans tous les cas
+$c(x)\le c(y)$.
+\emph{Surjectivité.} Soit $t\in[0,1]$, de développement binaire $t=\sum_i \beta_i2^{-i}$,
+$\beta_i\in\{0,1\}$. Posons $x=\sum_i(2\beta_i)3^{-i}\in K$ ; alors, par construction, $c(x)=t$. Enfin
+$c(0)=0$ et $c(1)=c(0{.}222\ldots_3)=0{.}111\ldots_2=1$.
+
+(b) \emph{Continuité.} $c$ est croissante et son image contient $[0,1]$ tout entier (surjectivité).
+Une fonction croissante ne peut présenter qu'au plus des sauts, et un saut en $x_0$ priverait l'image
+de l'intervalle ouvert $\bigl(c(x_0^-),c(x_0^+)\bigr)$ ; l'image ne serait pas $[0,1]$. Donc $c$ est
+sans saut, c'est-à-dire continue.
+
+(c) Chaque intervalle contigu de $K$ est un intervalle ouvert sur lequel $c$ est constante, donc
+$c'=0$ y est identiquement nulle. Comme $\lambda([0,1]\setminus K)=1$, on a $c'=0$ \pp, d'où
+$\int_0^1 c'=0$. Or $c(1)-c(0)=1$.
+\end{proof}
+
+\begin{remarque}
+$c$ est höldérienne d'exposant $\alpha=\log2/\log3\approx0{,}63$ : sur deux points d'un même intervalle
+triadique de niveau $n$ (longueur $3^{-n}$), $c$ varie d'au plus $2^{-n}=(3^{-n})^{\alpha}$, d'où
+$\abs{c(x)-c(y)}\le C\abs{x-y}^{\alpha}$. Elle n'est lipschitzienne sur aucun voisinage d'un point de
+$K$ (sinon on aurait $\alpha\ge1$).
+\end{remarque}
+
+\begin{remarque}[lecture par les mesures]
+À $c$ croissante on associe la mesure de Lebesgue--Stieltjes $\mu_c$ définie par
+$\mu_c(]x,y])=c(y)-c(x)$. C'est une probabilité, \emph{sans atome} (car $c$ continue), \emph{portée
+par $K$} (car $c$ constante hors de $K$), donc \emph{étrangère} à $\lambda$ : $\mu_c\perp\lambda$.
+L'égalité $\int_a^b F'=F(b)-F(a)$ équivaut à $d\mu_F=F'\,d\lambda$, c'est-à-dire à l'absolue
+continuité de $\mu_F$ par rapport à $\lambda$ ; l'escalier échoue précisément parce que $\mu_c$ est
+singulière. C'est le diagnostic qui guide toute la suite.
+\end{remarque}
+
+% ============================================================
+\section{Fonctions à variation bornée}
+% ============================================================
+
+\begin{definition}
+La \emph{variation totale} de $f$ sur $[a,b]$ est
+$\Var_a^b(f)=\sup\sum_{k}\abs{f(x_k)-f(x_{k-1})}$, le sup portant sur toutes les subdivisions
+$a=x_0<\cdots<x_n=b$. On note $f\in BV[a,b]$ si $\Var_a^b(f)<\infty$.
+\end{definition}
+
+On vérifie aisément l'\emph{additivité} $\Var_a^c(f)=\Var_a^x(f)+\Var_x^c(f)$ pour $a\le x\le c$
+(toute subdivision se raffine en insérant $x$).
+
+\begin{theoreme}[Jordan]\label{thm:jordan}
+$f\in BV[a,b]$ si et seulement si $f=g-h$ avec $g,h$ croissantes.
+\end{theoreme}
+
+\begin{proof}
+$(\Leftarrow)$ Une fonction croissante $\varphi$ est $BV$ avec $\Var_a^b(\varphi)=\varphi(b)-\varphi(a)$
+(toute somme télescope). Et $BV$ est un espace vectoriel : $\Var(f_1+f_2)\le\Var(f_1)+\Var(f_2)$ par
+inégalité triangulaire. Donc $g-h\in BV$.
+
+$(\Rightarrow)$ Posons $v(x)=\Var_a^x(f)$, croissante par additivité. Montrons que $v-f$ est
+croissante : pour $x<y$,
+\[
+(v-f)(y)-(v-f)(x)=\underbrace{\Var_x^y(f)}_{\ge\,\abs{f(y)-f(x)}}-\bigl(f(y)-f(x)\bigr)\ge
+\abs{f(y)-f(x)}-\bigl(f(y)-f(x)\bigr)\ge0.
+\]
+Ainsi $f=v-(v-f)$ est différence de deux fonctions croissantes.
+\end{proof}
+
+\begin{corollaire}\label{cor:bv}
+Toute $f\in BV[a,b]$ est dérivable \pp, $f'\in L^1$, et $\int_a^b\abs{f'}\le\Var_a^b(f)$.
+\end{corollaire}
+
+\begin{proof}
+Écrire $f=g-h$ (théorème~\ref{thm:jordan}) et appliquer le théorème~\ref{thm:mono} à $g$ et $h$ :
+$g',h'$ existent \pp, sont dans $L^1$, donc $f'=g'-h'$ aussi. Enfin $\abs{f'}\le g'+h'$ et
+$\int(g'+h')\le\bigl(g(b)-g(a)\bigr)+\bigl(h(b)-h(a)\bigr)=\Var_a^b(f)$ (avec $g=v$, $h=v-f$).
+\end{proof}
+
+L'escalier de Cantor, croissant, est dans $BV$ (avec $\Var_0^1(c)=1$) et fournit déjà le
+contre-exemple : \emph{la variation bornée ne suffit pas} au TFA. Il faut restreindre davantage.
+
+% ============================================================
+\section{Continuité absolue, et deux lemmes géométriques}
+% ============================================================
+
+\begin{definition}\label{def:ac}
+$F:[a,b]\to\R$ est \emph{absolument continue} ($F\in AC[a,b]$) si : pour tout $\eps>0$ il existe
+$\delta>0$ tel que, pour toute famille finie d'intervalles ouverts disjoints $(a_k,b_k)_{k=1}^n$,
+\[
+\sum_{k=1}^n(b_k-a_k)<\delta\ \Longrightarrow\ \sum_{k=1}^n\abs{F(b_k)-F(a_k)}<\eps.
+\]
+\end{definition}
+
+\begin{remarque}
+La même implication vaut alors pour une famille \emph{dénombrable} d'intervalles disjoints de longueur
+totale $<\delta$ : appliquer la condition aux sommes partielles finies (chacune $<\eps$) et passer à
+la limite. On l'utilisera librement.
+\end{remarque}
+
+\begin{proposition}[hiérarchie]\label{prop:hier}
+Sur $[a,b]$ : $\Lip\subset AC\subset BV$, et $AC$ entraîne la continuité uniforme.
+\end{proposition}
+
+\begin{proof}
+\emph{$\Lip\subset AC$ :} si $\abs{F(x)-F(y)}\le L\abs{x-y}$, alors
+$\sum\abs{F(b_k)-F(a_k)}\le L\sum(b_k-a_k)$ ; prendre $\delta=\eps/L$.
+\emph{$AC\Rightarrow$ continuité uniforme :} c'est le cas $n=1$ de la définition.
+\emph{$AC\subset BV$ :} soit $\delta$ associé à $\eps=1$. Découpons $[a,b]$ en $M=\lceil(b-a)/\delta\rceil$
+sous-intervalles $J_1,\dots,J_M$ de longueur $<\delta$. Sur chaque $J_m$, toute subdivision est une
+famille d'intervalles disjoints de longueur totale $<\delta$, donc $\Var_{J_m}(F)\le1$. Par additivité,
+$\Var_a^b(F)\le M<\infty$.
+\end{proof}
+
+\begin{exemple}\label{ex:integrale-ac}
+Si $g\in L^1$, alors $F(x)=\int_a^x g$ est $AC$. En effet l'absolue continuité de l'intégrale de
+Lebesgue donne, pour $\sum(b_k-a_k)<\delta$ bien choisi,
+$\sum\abs{F(b_k)-F(a_k)}\le\int_{\bigcup(a_k,b_k)}\abs g<\eps$.
+\end{exemple}
+
+\begin{contreexemple}\label{ce:cantor-nonac}
+L'escalier $c$ est continu et $BV$, mais \emph{pas} $AC$. À tout niveau $n$, les $2^n$ intervalles de
+$K_n$ ont une longueur totale $(2/3)^n\to0$, alors que $c$ y accomplit \emph{toute} sa croissance : la
+somme des accroissements de $c$ sur ces intervalles vaut $1$ (leurs images pavent $[0,1]$). Aucun
+$\delta$ ne convient pour $\eps=\tfrac12$.
+\end{contreexemple}
+
+On établit maintenant deux lemmes géométriques, cœur technique de tout ce qui suit.
+
+\begin{lemme}[image d'un ensemble à dérivée nulle]\label{lem:image}
+Soit $H:[a,b]\to\R$ et $A\subset[a,b]$ tels que $H$ soit dérivable en chaque point de $A$ avec
+$H'\equiv0$ sur $A$. Alors $\lstar\bigl(H(A)\bigr)=0$.
+\end{lemme}
+
+\begin{proof}
+Fixons $\eps>0$ et, pour $n\ge1$, posons
+\[
+A_n=\Bigl\{x\in A:\ \abs{H(y)-H(x)}\le\eps\abs{y-x}\ \text{ pour tout }y\text{ avec }\abs{y-x}\le\tfrac1n\Bigr\}.
+\]
+Comme $H'(x)=0$ sur $A$, tout $x\in A$ appartient à $A_n$ pour $n$ assez grand : $A=\bigcup_n A_n$,
+suite croissante. Fixons $n$ et découpons $[a,b]$ en cellules $J$ de longueur $\le1/n$. Si
+$x,x'\in A_n\cap J$, alors $\abs{x-x'}\le\lambda(J)\le1/n$, donc $\abs{H(x)-H(x')}\le\eps\abs{x-x'}\le
+\eps\lambda(J)$. Ainsi $\diam H(A_n\cap J)\le\eps\lambda(J)$, d'où $\lstar\bigl(H(A_n\cap J)\bigr)\le
+\eps\lambda(J)$. En sommant sur les cellules recouvrant $[a,b]$ (de longueur totale $b-a$) :
+\[
+\lstar\bigl(H(A_n)\bigr)\le\sum_J\eps\lambda(J)=\eps(b-a).
+\]
+Comme $A_n\uparrow A$, on a $H(A_n)\uparrow H(A)$, et par continuité croissante de $\lstar$ (proposition~\ref{prop:contcroiss})
+$\lstar\bigl(H(A)\bigr)=\lim_n\lstar\bigl(H(A_n)\bigr)\le\eps(b-a)$. Enfin $\eps\to0$ donne
+$\lstar\bigl(H(A)\bigr)=0$.
+\end{proof}
+
+\begin{proposition}[$AC$ vérifie la propriété (N) de Luzin]\label{prop:luzin}
+Si $F\in AC[a,b]$ et $\lambda(Z)=0$, alors $\lambda\bigl(F(Z)\bigr)=0$.
+\end{proposition}
+
+\begin{proof}
+Fixons $\eps>0$ et $\delta>0$ associé par l'absolue continuité. Comme $\lambda(Z)=0$, la régularité
+extérieure (proposition~\ref{prop:regext}) fournit un ouvert $U\supset Z$ avec $\lambda(U)<\delta$ ;
+écrivons $U\cap(a,b)=\bigsqcup_k(a_k,b_k)$ (intervalles
+disjoints), de sorte que $\sum_k(b_k-a_k)\le\lambda(U)<\delta$. Sur chaque $[a_k,b_k]$, $F$ continue
+atteint son max en $p_k$ et son min en $q_k$ ; alors $F\bigl(Z\cap(a_k,b_k)\bigr)\subset[F(q_k),F(p_k)]$,
+de longueur $\abs{F(p_k)-F(q_k)}$. Les couples $\{p_k,q_k\}$ définissent des intervalles deux à deux
+disjoints (les $(a_k,b_k)$ le sont), de longueur totale $<\delta$. Par absolue continuité (version
+dénombrable),
+\[
+\lstar\bigl(F(Z)\bigr)\le\sum_k\abs{F(p_k)-F(q_k)}\le\eps.
+\]
+Comme $\eps>0$ est arbitraire, $\lambda\bigl(F(Z)\bigr)=0$.
+\end{proof}
+
+\begin{lemme}[rigidité]\label{lem:rigidite}
+Si $F\in AC[a,b]$ et $F'=0$ \pp, alors $F$ est constante.
+\end{lemme}
+
+\begin{proof}
+Soit $A=\{x:F'(x)=0\}$, de mesure pleine : $\lambda([a,b]\setminus A)=0$. Le lemme~\ref{lem:image}
+donne $\lambda\bigl(F(A)\bigr)=0$, et la proposition~\ref{prop:luzin} donne
+$\lambda\bigl(F([a,b]\setminus A)\bigr)=0$. Donc $\lambda\bigl(F([a,b])\bigr)=0$. Mais $F$ est continue
+sur l'intervalle $[a,b]$, donc $F([a,b])$ est un intervalle (théorème des valeurs intermédiaires) ;
+un intervalle de mesure nulle est réduit à un point. Donc $F$ est constante.
+\end{proof}
+
+\begin{remarque}
+Le lemme est \emph{faux} sans $AC$ : l'escalier de Cantor est continu, $F'=0$ \pp, mais non constant.
+Ici, c'est la proposition~\ref{prop:luzin} qui tombe en défaut --- Cantor viole la propriété (N),
+puisqu'il envoie $K$ (négligeable) sur $[0,1]$ (de mesure $1$). C'est le seul ingrédient qui lui
+manque pour être $AC$.
+\end{remarque}
+
+% ============================================================
+\section{Volet I : dérivation de l'intégrale}
+% ============================================================
+
+On démontre ici que dériver l'intégrale redonne l'intégrande. Un lemme d'annulation est d'abord requis.
+
+\begin{lemme}[intégrale nulle]\label{lem:nul}
+Si $g\in L^1$ et $\int_a^x g=0$ pour tout $x\in[a,b]$, alors $g=0$ \pp.
+\end{lemme}
+
+\begin{proof}
+Par différence, $\int_c^d g=0$ pour tout sous-intervalle $[c,d]$. Tout ouvert $U\subset(a,b)$ étant
+réunion dénombrable disjointe d'intervalles, la convergence dominée donne $\int_U g=0$. Par régularité extérieure (proposition~\ref{prop:regext})
+extérieure, pour tout mesurable $E$ et tout $\eps>0$ il existe un ouvert $U\supset E$ avec
+$\lambda(U\setminus E)<\eps$, d'où $\abs{\int_E g}=\abs{\int_U g-\int_{U\setminus E}g}\le
+\int_{U\setminus E}\abs g\to0$ ; donc $\int_E g=0$ pour tout mesurable $E$. En prenant $E=\{g>0\}$ on
+obtient $\int_{\{g>0\}}g=0$ avec $g>0$ sur $E$, donc $\lambda(\{g>0\})=0$ ; de même
+$\lambda(\{g<0\})=0$. Ainsi $g=0$ \pp.
+\end{proof}
+
+\begin{theoreme}[Lebesgue --- dérivation de l'intégrale]\label{thm:volet1}
+Soit $g\in L^1([a,b])$ et $G(x)=\int_a^x g$. Alors $G\in AC$, $G$ est dérivable \pp, et $G'=g$ \pp.
+\end{theoreme}
+
+\begin{proof}
+Que $G\in AC$ est l'exemple~\ref{ex:integrale-ac} ; donc $G\in BV$ et $G'$ existe \pp{}
+(corollaire~\ref{cor:bv}). Il reste à établir $G'=g$ \pp. On prolonge $g$ par $0$ hors de $[a,b]$.
+
+\emph{Étape 1 : $g$ bornée, $\abs g\le M$.} Alors $G$ est $M$-lipschitzienne
+($\abs{G(x)-G(y)}\le M\abs{x-y}$), donc dérivable \pp{} avec $\abs{G'}\le M$. Posons
+$\varphi_n(x)=n\bigl(G(x+\tfrac1n)-G(x)\bigr)=n\int_x^{x+1/n}g$. Alors $\abs{\varphi_n}\le M$ et
+$\varphi_n\to G'$ \pp. Par convergence dominée, pour tout $c\in[a,b]$,
+\[
+\int_a^c G'=\lim_n\int_a^c\varphi_n
+=\lim_n n\Bigl[\int_c^{c+1/n}\!\!G-\int_a^{a+1/n}\!\!G\Bigr]=G(c)-G(a),
+\]
+la dernière égalité venant de la continuité de $G$ (valeur moyenne de $G$ sur un intervalle de longueur
+$1/n$ autour de $c$, resp. $a$). Donc $\int_a^c(G'-g)=\int_a^c G'-\bigl(G(c)-G(a)\bigr)=0$ pour tout
+$c$, et le lemme~\ref{lem:nul} donne $G'=g$ \pp.
+
+\emph{Étape 2 : $g\ge0$, $g\in L^1$.} Pour $M>0$, posons $g_M=\min(g,M)$ (bornée) et
+$R_M(x)=\int_a^x(g-g_M)$. Comme $g-g_M\ge0$, $R_M$ est croissante, donc $R_M'\ge0$ \pp{}
+(théorème~\ref{thm:mono}). Or $G=\int g=\int g_M+R_M$, d'où par l'étape 1
+\[
+G'=g_M+R_M'\ge g_M\quad\pp.
+\]
+Ceci valant pour tout $M$, en faisant $M\to\infty$ : $G'\ge g$ \pp. On intègre : $\int_a^b G'\ge
+\int_a^b g=G(b)-G(a)$. Mais $G$ est croissante (car $g\ge0$), donc $\int_a^b G'\le G(b)-G(a)$
+(théorème~\ref{thm:mono}). Les deux inégalités forcent $\int_a^b(G'-g)=0$ avec $G'-g\ge0$, donc
+$G'=g$ \pp.
+
+\emph{Étape 3 : cas général.} Écrire $g=g^+-g^-$ avec $g^\pm\in L^1$, $g^\pm\ge0$, et appliquer
+l'étape 2 à chacun : $\bigl(\int_a^x g^\pm\bigr)'=g^\pm$ \pp, d'où par différence $G'=g$ \pp.
+\end{proof}
+
+% ============================================================
+\section{Volet II : la formule de Newton--Leibniz}
+% ============================================================
+
+\begin{theoreme}[TFA de Lebesgue]\label{thm:volet2}
+Pour $F:[a,b]\to\R$, les assertions suivantes sont équivalentes :
+\begin{enumerate}[label=\textup{(\roman*)},leftmargin=2.4em,itemsep=1pt]
+  \item $F\in AC[a,b]$ ;
+  \item il existe $g\in L^1$ avec $F(x)=F(a)+\int_a^x g$ pour tout $x$ ;
+  \item $F$ est dérivable \pp, $F'\in L^1$, et $F(x)-F(a)=\int_a^x F'$ pour tout $x\in[a,b]$.
+\end{enumerate}
+Dans ce cas $g=F'$ \pp.
+\end{theoreme}
+
+\begin{proof}
+$(iii)\Rightarrow(ii)$ est immédiat (prendre $g=F'$). $(ii)\Rightarrow(i)$ est l'exemple~\ref{ex:integrale-ac}.
+
+$(ii)\Rightarrow(iii)$ : par le théorème~\ref{thm:volet1}, $F'=\bigl(F(a)+\int_a^x g\bigr)'=g$ \pp,
+donc $F'\in L^1$ et $F(x)-F(a)=\int_a^x g=\int_a^x F'$.
+
+$(i)\Rightarrow(iii)$ : c'est le cœur. Comme $F\in AC\subset BV$ (proposition~\ref{prop:hier}), $F'$
+existe \pp{} et $F'\in L^1$ (corollaire~\ref{cor:bv}). Posons $G(x)=\int_a^x F'$. Par le
+théorème~\ref{thm:volet1}, $G\in AC$ et $G'=F'$ \pp. La différence $H=F-G$ est alors $AC$ (différence
+de deux fonctions $AC$) et vérifie $H'=F'-G'=0$ \pp. Le lemme de rigidité~\ref{lem:rigidite} donne $H$
+constante ; comme $H(a)=F(a)-0=F(a)$, on a $F(x)-G(x)=F(a)$, soit
+\[
+F(x)-F(a)=G(x)=\int_a^x F'\qquad\forall x.\qedhere
+\]
+\end{proof}
+
+\keybox{Le message central}{%
+La formule $\int_a^b F'=F(b)-F(a)$ vaut \emph{exactement} pour les fonctions absolument continues.
+« Continue » ne suffit pas ; « $BV$ » ne suffit pas ; « dérivable \pp » ne suffit pas. L'escalier de
+Cantor appartient à toutes ces classes intermédiaires \emph{sauf} $AC$, et c'est précisément pourquoi
+il échappe au TFA.}
+
+\subsection{La caractérisation de Banach--Zaretsky}
+
+La proposition~\ref{prop:luzin} livre gratuitement une seconde preuve de la non-absolue-continuité de
+Cantor, et éclaire ce qui lui manque.
+
+\begin{corollaire}\label{cor:cantor-N}
+L'escalier de Cantor n'est pas absolument continu, car il viole la propriété (N) : il envoie $K$
+(négligeable) sur $[0,1]$ (de mesure $1$), tandis que toute fonction $AC$ préserve la négligeabilité
+(proposition~\ref{prop:luzin}).
+\end{corollaire}
+
+Le tableau se complète par le théorème de Banach--Zaretsky, dont on démontre la direction utile et
+dont on énonce la réciproque : \emph{$F$ est $AC$ si et seulement si $F$ est continue, à variation
+bornée, et vérifie la propriété (N).} La direction directe résulte de la proposition~\ref{prop:hier}
+($AC\Rightarrow$ continue, $BV$) et de la proposition~\ref{prop:luzin} ($AC\Rightarrow$ (N)). La
+réciproque, seule à faire appel à un résultat hors de notre boîte à outils (la formule de l'indicatrice
+de Banach $\int_\R \#F^{-1}(y)\,dy=\Var_a^b F$), assure qu'aucun autre contre-exemple structurel que
+le type « Cantor » ne peut exister parmi les fonctions continues $BV$.
+
+% ============================================================
+\section{Décomposition d'une fonction à variation bornée}
+% ============================================================
+
+Les contre-exemples ne sont pas des accidents : ce sont les composantes d'une décomposition canonique.
+
+\subsection{Construction directe}
+
+\begin{theoreme}[décomposition en trois parties]\label{thm:decomp}
+Toute fonction croissante $F:[a,b]\to\R$ s'écrit
+\[
+F=F_{\mathrm{ac}}+F_{\mathrm{s}}+F_{\mathrm{saut}},
+\]
+où $F_{\mathrm{ac}}$ est absolument continue croissante, $F_{\mathrm{saut}}$ est une fonction de sauts
+croissante (croissance concentrée sur un ensemble dénombrable), et $F_{\mathrm{s}}$ est croissante,
+\emph{continue}, de dérivée nulle \pp{} (partie \emph{singulière continue}). Par différence, tout
+$F\in BV$ se décompose de même.
+\end{theoreme}
+
+\begin{proof}
+\emph{Partie de sauts.} $F$ croissante n'a qu'un ensemble dénombrable $D=\{t_j\}$ de discontinuités,
+avec sauts $\sigma_j=F(t_j^+)-F(t_j^-)\ge0$ et $\sum_j\sigma_j\le F(b)-F(a)<\infty$. Posons
+\[
+F_{\mathrm{saut}}(x)=\sum_{t_j<x}\sigma_j+\bigl(F(x)-F(x^-)\bigr)\mathbf 1_{x\in D},
+\]
+croissante, dont les sauts reproduisent exactement ceux de $F$. Alors $\Phi:=F-F_{\mathrm{saut}}$ est
+croissante et \emph{continue} (ses sauts s'annulent).
+
+\emph{Parties absolument continue et singulière.} $\Phi$ croissante est dérivable \pp{} avec
+$\Phi'\ge0$, $\Phi'\in L^1$ (théorème~\ref{thm:mono}). Posons
+$F_{\mathrm{ac}}(x)=\int_a^x\Phi'$ (absolument continue, croissante, exemple~\ref{ex:integrale-ac})
+et $F_{\mathrm{s}}=\Phi-F_{\mathrm{ac}}$. Par le théorème~\ref{thm:volet1}, $F_{\mathrm{ac}}'=\Phi'$
+\pp, donc $F_{\mathrm{s}}'=\Phi'-\Phi'=0$ \pp. De plus $F_{\mathrm{s}}$ est continue (différence de
+deux fonctions continues) et croissante : en effet, pour $x<y$,
+$F_{\mathrm s}(y)-F_{\mathrm s}(x)=\bigl(\Phi(y)-\Phi(x)\bigr)-\int_x^y\Phi'\ge0$ par le
+théorème~\ref{thm:mono} appliqué à $\Phi$ sur $[x,y]$. C'est la partie singulière continue.
+\end{proof}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}>{\raggedright}p{3.4cm} c c >{\raggedright\arraybackslash}p{4.6cm}@{}}
+\toprule
+\textbf{Composante} & \textbf{Continue ?} & $\displaystyle\int F'=\Delta F$ ? & \textbf{Prototype} \\
+\midrule
+absolument continue & oui & \textbf{oui} & $\int_a^x g,\ g\in L^1$ \\
+singulière continue & oui & non ($F'=0$ \pp) & \textbf{escalier de Cantor} \\
+de sauts & non & non & fonction en escalier \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+La partie singulière continue est exactement l'obstruction au TFA parmi les fonctions \emph{continues} :
+tout ensemble de Cantor négligeable porte une mesure de probabilité continue singulière, d'où une
+famille entière de contre-exemples du même type que l'escalier.
+
+\subsection{Le point de vue des mesures : Lebesgue--Radon--Nikodym}\label{sub:lrn}
+
+La construction précédente est « à la main ». Le \emph{pourquoi} conceptuel apparaît en passant aux
+mesures. À une fonction croissante $F$ (prise continue à droite pour fixer les idées) on associe son
+unique \emph{mesure de Lebesgue--Stieltjes} $\mu_F$, mesure borélienne finie sur $[a,b]$ caractérisée
+par
+\[
+\mu_F(]x,y])=F(y)-F(x),\qquad a\le x\le y\le b.
+\]
+Décomposer $F$ revient à décomposer $\mu_F$. Deux dichotomies \emph{orthogonales} sont à l'œuvre :
+l'une relative à $\lambda$ (absolue continuité \emph{vs} singularité), l'autre intrinsèque (présence
+\emph{vs} absence d'atomes). Leur superposition produit exactement trois briques.
+
+\paragraph{Première dichotomie : absolue continuité contre singularité.}
+Pour deux mesures $\mu,\nu$ sur un même espace mesurable $(X,\mathcal M)$ :
+\begin{itemize}[leftmargin=1.6em,itemsep=1pt]
+  \item $\mu$ est \emph{absolument continue} par rapport à $\nu$, noté $\mu\ll\nu$, si
+  $\nu(E)=0\Rightarrow\mu(E)=0$ ;
+  \item $\mu$ et $\nu$ sont \emph{étrangères}, noté $\mu\perp\nu$, s'il existe une partition
+  $X=A\sqcup B$ ($\mathcal M$-mesurable) avec $\mu(B)=0$ et $\nu(A)=0$ : chacune vit là où l'autre ne
+  charge rien.
+\end{itemize}
+
+\begin{theoreme}[Lebesgue--Radon--Nikodym]\label{thm:lrn}
+Soient $\mu$ et $\lambda$ deux mesures \emph{finies} sur $(X,\mathcal M)$.
+\begin{enumerate}[label=\textup{(\roman*)},leftmargin=2.4em,itemsep=1pt]
+  \item \textup{(Décomposition de Lebesgue.)} $\mu$ s'écrit de manière \emph{unique}
+  $\mu=\mu_{\mathrm{ac}}+\mu_{\perp}$ avec $\mu_{\mathrm{ac}}\ll\lambda$ et $\mu_{\perp}\perp\lambda$.
+  \item \textup{(Radon--Nikodym.)} Il existe une fonction mesurable $g\ge0$, unique à égalité
+  $\lambda$-\pp{} près, telle que $\mu_{\mathrm{ac}}(E)=\int_E g\,d\lambda$ pour tout $E\in\mathcal M$.
+  On l'appelle \emph{densité} et on note $g=\dfrac{d\mu_{\mathrm{ac}}}{d\lambda}$.
+\end{enumerate}
+\end{theoreme}
+
+\begin{proof}[Démonstration (von Neumann)]
+Posons la mesure finie $\varphi=\mu+\lambda$ et travaillons dans l'espace de Hilbert $L^2(\varphi)$.
+La forme linéaire $T(f)=\int_X f\,d\mu$ y est continue : par Cauchy--Schwarz,
+\[
+\abs{T(f)}\le\int_X\abs f\,d\mu\le\int_X\abs f\,d\varphi\le\varphi(X)^{1/2}\,\norm{f}_{L^2(\varphi)}.
+\]
+Le théorème de représentation de Riesz--Fréchet fournit donc $h\in L^2(\varphi)$ avec
+\begin{equation}\label{eq:rn1}
+\int_X f\,d\mu=\int_X f\,h\,d\varphi\qquad\text{pour tout }f\in L^2(\varphi).
+\end{equation}
+En prenant $f=\mathbf 1_E$ : $\mu(E)=\int_E h\,d\varphi$ ; comme $0\le\mu(E)\le\varphi(E)$, on a
+$0\le h\le1$ $\varphi$-\pp. Puisque $d\varphi=d\mu+d\lambda$, l'égalité \eqref{eq:rn1} se réécrit
+\begin{equation}\label{eq:rn2}
+\int_X f\,(1-h)\,d\mu=\int_X f\,h\,d\lambda\qquad\text{pour tout }f\in L^2(\varphi).
+\end{equation}
+Séparons $X=A\sqcup B$ avec $A=\{0\le h<1\}$ et $B=\{h=1\}$, et posons
+$\mu_{\mathrm{ac}}(E)=\mu(E\cap A)$, $\mu_{\perp}(E)=\mu(E\cap B)$.
+
+\emph{$\mu_{\perp}\perp\lambda$.} Dans \eqref{eq:rn2} avec $f=\mathbf 1_B$ : le membre de gauche est
+$\int_B(1-h)\,d\mu=0$ (car $h=1$ sur $B$), donc $\int_B h\,d\lambda=\lambda(B)=0$. Ainsi $\lambda$ ne
+charge pas $B$, tandis que $\mu_{\perp}$ est concentrée sur $B$ : elles sont étrangères.
+
+\emph{$\mu_{\mathrm{ac}}\ll\lambda$, avec densité.} Appliquons \eqref{eq:rn2} à
+$f=(1+h+\cdots+h^n)\mathbf 1_E$. À gauche, $\int_E(1-h^{n+1})\,d\mu$ ; à droite,
+$\int_E(h+h^2+\cdots+h^{n+1})\,d\lambda$. Quand $n\to\infty$, sur $A$ on a $h<1$ donc
+$1-h^{n+1}\uparrow1$, et sur $B$ le terme de gauche est nul : par convergence monotone, le membre de
+gauche tend vers $\mu(E\cap A)=\mu_{\mathrm{ac}}(E)$. À droite, la série croît vers
+$g:=\sum_{k\ge1}h^k=\dfrac{h}{1-h}$ sur $A$ (et l'on pose $g=0$ sur $B$, licite car $\lambda(B)=0$) ;
+par convergence monotone à nouveau,
+\[
+\mu_{\mathrm{ac}}(E)=\int_E g\,d\lambda.
+\]
+Donc $\mu_{\mathrm{ac}}\ll\lambda$ et $g\ge0$ est sa densité ; $g\in L^1(\lambda)$ car
+$\mu_{\mathrm{ac}}(X)<\infty$.
+
+\emph{Unicité.} Si $\mu=\mu_1+\nu_1=\mu_2+\nu_2$ avec $\mu_i\ll\lambda$ et $\nu_i\perp\lambda$, alors
+$\eta:=\mu_1-\mu_2=\nu_2-\nu_1$ est à la fois $\ll\lambda$ et $\perp\lambda$. Étant $\perp\lambda$,
+$\eta$ est concentrée sur un ensemble $\lambda$-négligeable $N$ ; étant $\ll\lambda$, elle s'annule sur
+tout négligeable, donc $\eta(E)=\eta(E\cap N)=0$ pour tout $E$ : $\eta=0$. L'unicité de $g$ modulo
+$\lambda$-\pp{} en découle.
+\end{proof}
+
+\begin{remarque}
+Le cas $\sigma$-fini s'en déduit par exhaustion ($X=\bigsqcup_n X_n$, $\mu,\lambda$ finies sur chaque
+$X_n$), et le cas signé par la décomposition de Jordan de la mesure. Enfin, appliqué à $\mu_F\ll\lambda$
+avec $g=d\mu_{\mathrm{ac}}/d\lambda$, on a $g=F'$ $\lambda$-\pp{} : c'est le théorème de différentiation
+de Lebesgue pour les mesures (les parties singulières ont une dérivée de Radon--Nikodym nulle \pp,
+renforcement du théorème~\ref{thm:volet1} via un recouvrement de Vitali--Besicovitch). Pour la partie
+absolument continue $\mu_{\mathrm{ac}}=g\,\lambda$, le volet~I (théorème~\ref{thm:volet1}) donne bien
+$\bigl(\int_a^x g\bigr)'=g$ \pp.
+\end{remarque}
+
+\paragraph{Seconde dichotomie : atomes contre partie diffuse.}
+Un point $x$ est un \emph{atome} de $\nu$ si $\nu(\{x\})>0$. La mesure $\nu$ est \emph{purement
+atomique} si elle est portée par un ensemble dénombrable d'atomes, et \emph{diffuse} (ou
+\emph{continue}) si $\nu(\{x\})=0$ pour tout $x$.
+
+\begin{proposition}[décomposition atomique / diffuse]\label{prop:atom}
+Toute mesure borélienne finie $\nu$ sur $\R$ s'écrit de manière unique
+$\nu=\nu_{\mathrm{at}}+\nu_{\mathrm{cont}}$, avec $\nu_{\mathrm{at}}$ purement atomique et
+$\nu_{\mathrm{cont}}$ diffuse.
+\end{proposition}
+
+\begin{proof}
+L'ensemble des atomes $D=\{x:\nu(\{x\})>0\}$ est \emph{dénombrable} : pour chaque $m$, l'ensemble
+$\{x:\nu(\{x\})>1/m\}$ a au plus $m\,\nu(\R)$ éléments (leurs masses, disjointes, se somment dans
+$\nu(\R)$), et $D=\bigcup_m\{x:\nu(\{x\})>1/m\}$. Posons alors
+$\nu_{\mathrm{at}}=\sum_{x\in D}\nu(\{x\})\,\delta_x=\nu(\,\cdot\cap D)$ et
+$\nu_{\mathrm{cont}}=\nu(\,\cdot\setminus D)$. Pour tout $y$, $\nu_{\mathrm{cont}}(\{y\})=0$ (si
+$y\in D$, on a retiré sa masse ; si $y\notin D$, $\nu(\{y\})=0$) : $\nu_{\mathrm{cont}}$ est diffuse.
+L'unicité est immédiate car les atomes sont intrinsèques à $\nu$.
+\end{proof}
+
+\paragraph{Superposition : les trois briques.}
+Appliquons Lebesgue--Radon--Nikodym à $\mu_F$, puis scindons la partie singulière $\mu_\perp$ selon la
+proposition~\ref{prop:atom}, en $\mu_\perp=\mu_{\mathrm{at}}+\mu_{\mathrm{sc}}$. Deux observations
+verrouillent l'articulation :
+\begin{itemize}[leftmargin=1.6em,itemsep=1pt]
+  \item \textbf{tout atome est singulier} : un singleton est $\lambda$-négligeable, donc
+  $\mu_{\mathrm{at}}\perp\lambda$ ; la partie atomique loge \emph{entièrement} dans le singulier ;
+  \item \textbf{la partie absolument continue est diffuse} : $\mu_{\mathrm{ac}}\ll\lambda$ et
+  $\lambda(\{x\})=0$ entraînent $\mu_{\mathrm{ac}}(\{x\})=0$ ; elle n'a aucun atome.
+\end{itemize}
+Il n'y a donc pas de quatrième brique, et l'on obtient la décomposition canonique
+\[
+\mu_F=\underbrace{g\,\lambda}_{\ll\lambda\ (\text{diffuse})}
+\;+\;\underbrace{\mu_{\mathrm{sc}}}_{\perp\lambda,\ \text{diffuse}}
+\;+\;\underbrace{\sum_{j}\sigma_j\,\delta_{t_j}}_{\text{atomique}\ (\perp\lambda)},
+\qquad g=F'\ \lambda\text{-\pp}.
+\]
+
+\begin{center}
+\begin{tikzpicture}[
+  every node/.style={font=\footnotesize},
+  box/.style={draw=NavyBlue, rounded corners, align=center, inner sep=4pt, fill=BoxBlue},
+  leaf/.style={draw=ForestGreen!65!black, rounded corners, align=center, inner sep=4pt},
+  lab/.style={midway, font=\scriptsize\itshape, fill=white, inner sep=1pt}
+]
+  \node[box] (root) at (7,0) {$\mu_F$ \ (mesure de Stieltjes de $F$)};
+  \node[box] (ac)   at (2.6,-2) {$\mu_{\mathrm{ac}}\ll\lambda$};
+  \node[box] (si)   at (10.6,-2) {$\mu_{\perp}\perp\lambda$ \ (singulière)};
+  \node[leaf] (acL) at (2.6,-4.4) {\textbf{absolument continue}\\ $\mu_{\mathrm{ac}}=F'\lambda$\\[1pt]
+        $\to F_{\mathrm{ac}}(x)=\int_a^x F'$};
+  \node[leaf] (at)  at (7.4,-4.4) {\textbf{atomique (sauts)}\\ $\sum_j\sigma_j\delta_{t_j}$\\[1pt]
+        $\to F_{\mathrm{saut}}$};
+  \node[leaf] (sc)  at (11.9,-4.4) {\textbf{singulière continue}\\ $\mu_{\mathrm{sc}}$ (type Cantor)\\[1pt]
+        $\to F_{\mathrm{s}}$};
+  \draw[gray!60] (root) -- (ac) node[lab,pos=0.55]{$\ll\lambda$};
+  \draw[gray!60] (root) -- (si) node[lab,pos=0.55]{$\perp\lambda$};
+  \draw[gray!60] (ac)   -- (acL);
+  \draw[gray!60] (si)   -- (at) node[lab,pos=0.55]{atomique};
+  \draw[gray!60] (si)   -- (sc) node[lab,pos=0.55]{diffuse};
+\end{tikzpicture}
+\end{center}
+
+\noindent
+\textbf{La réponse à « comment la partie singulière se scinde ».} La singularité (relation à $\lambda$)
+et l'atomicité (propriété intrinsèque) sont indépendantes. La partie singulière $\mu_\perp$ rassemble
+\emph{tout} ce qui est étranger à $\lambda$ ; on la trie alors selon la seconde dichotomie : sa
+composante atomique $\mu_{\mathrm{at}}=\sum_j\sigma_j\delta_{t_j}$ (les \emph{sauts} de $F$, aux points
+de discontinuité $t_j$, de masses $\sigma_j=F(t_j^+)-F(t_j^-)$) et sa composante diffuse
+$\mu_{\mathrm{sc}}$, sans atome mais toujours étrangère à $\lambda$ (la partie \emph{singulière
+continue}, portée par un négligeable, dont l'escalier de Cantor est le prototype via $\mu_c$). La
+partie absolument continue, elle, est automatiquement diffuse : c'est pourquoi le monde « continu » se
+partage encore en $\mathrm{ac}+\mathrm{sc}$, tandis que le monde « atomique » est tout entier singulier.
+
+\paragraph{Retour aux fonctions (le dictionnaire).}
+En intégrant chaque brique sur $]a,x]$, on retrouve terme à terme la décomposition du
+théorème~\ref{thm:decomp} :
+\[
+F(x)-F(a)=\mu_F(]a,x])
+=\underbrace{\int_a^x F'\,d\lambda}_{F_{\mathrm{ac}}(x)-F_{\mathrm{ac}}(a)}
+\;+\;\underbrace{\mu_{\mathrm{sc}}(]a,x])}_{F_{\mathrm{s}}(x)-F_{\mathrm{s}}(a)}
+\;+\;\underbrace{\sum_{a<t_j\le x}\sigma_j}_{F_{\mathrm{saut}}(x)-F_{\mathrm{saut}}(a)}.
+\]
+Le volet~II du TFA (théorème~\ref{thm:volet2}) se relit alors ainsi : $\int_a^x F'=F(x)-F(a)$ pour
+\emph{tout} $x$ équivaut à la nullité des \emph{deux} briques singulières, c'est-à-dire à
+$\mu_F=g\,\lambda$, soit $\mu_F\ll\lambda$ --- exactement l'absolue continuité de $F$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}>{\raggedright}p{3.5cm} >{\raggedright}p{4.1cm} >{\raggedright\arraybackslash}p{6.4cm}@{}}
+\toprule
+\textbf{Brique de $\mu_F$} & \textbf{Nature} & \textbf{Fonction \& obstruction au TFA} \\
+\midrule
+$g\,\lambda$ & $\ll\lambda$, diffuse & $F_{\mathrm{ac}}=\int_a^x F'$ : aucune obstruction \\
+$\mu_{\mathrm{sc}}$ & $\perp\lambda$, diffuse & $F_{\mathrm{s}}$ (Cantor) : $F'=0$ \pp, saut « lissé » \\
+$\sum_j\sigma_j\delta_{t_j}$ & $\perp\lambda$, atomique & $F_{\mathrm{saut}}$ : croissance par sauts discrets \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+\section{Au-delà de Lebesgue : l'intégrale de Henstock--Kurzweil}
+% ============================================================
+
+Le volet II exige $F'\in L^1$. Or une fonction peut être dérivable \emph{partout} sans dérivée
+Lebesgue-intégrable.
+
+\begin{contreexemple}[dérivée partout, mais non $L^1$]\label{ce:hk}
+Soit $F(x)=x^2\sin(1/x^2)$ pour $x\neq0$, $F(0)=0$. Alors $F$ est dérivable partout : pour $x\neq0$,
+\[
+F'(x)=2x\sin(1/x^2)-\tfrac{2}{x}\cos(1/x^2),
+\]
+et $F'(0)=\lim_{x\to0}\tfrac{F(x)}{x}=\lim_{x\to0}x\sin(1/x^2)=0$. Le terme $2x\sin(1/x^2)$ est borné
+par $2\abs x$, donc intégrable. Pour l'autre, le changement de variable $t=1/x^2$ (soit
+$x=t^{-1/2}$, $dx=-\tfrac12 t^{-3/2}\dt$) donne
+\[
+\int_0^1\abs*{\tfrac{2}{x}\cos(1/x^2)}\dx=\int_1^{\infty}2\,t^{1/2}\abs{\cos t}\cdot\tfrac12 t^{-3/2}\dt
+=\int_1^{\infty}\frac{\abs{\cos t}}{t}\dt=+\infty,
+\]
+car $\abs{\cos t}$ est de moyenne $2/\pi>0$ et $\int_1^\infty \tfrac{dt}{t}=+\infty$. Donc
+$\int_0^1\abs{F'}=+\infty$ : $F'\notin L^1$, et le volet~II ne s'applique pas, bien que $F$ soit
+dérivable partout.
+\end{contreexemple}
+
+L'intégrale de Henstock--Kurzweil (dite \emph{de jauge}) répare cela. Une \emph{jauge} sur $[a,b]$ est
+une fonction $\delta:[a,b]\to(0,\infty)$. Une subdivision pointée $P=\{(t_i,[x_{i-1},x_i])\}_{i=1}^n$
+(avec $t_i\in[x_{i-1},x_i]$) est \emph{$\delta$-fine} si $[x_{i-1},x_i]\subset(t_i-\delta(t_i),t_i+\delta(t_i))$
+pour tout $i$. On dit que $f$ est HK-intégrable d'intégrale $\mathcal A$ si, pour tout $\eps>0$, il
+existe une jauge $\delta$ telle que toute subdivision pointée $\delta$-fine vérifie
+$\abs{\sum_i f(t_i)(x_i-x_{i-1})-\mathcal A}<\eps$.
+
+\begin{lemme}[Cousin]\label{lem:cousin}
+Pour toute jauge $\delta$ sur $[a,b]$, il existe une subdivision pointée $\delta$-fine.
+\end{lemme}
+
+\begin{proof}
+Supposons qu'il n'en existe pas. Coupons $[a,b]$ en deux moitiés : l'une au moins n'admet pas de
+subdivision pointée $\delta$-fine (sinon on concaténerait). On construit ainsi une suite d'intervalles
+emboîtés $[a_k,b_k]$, de longueur $(b-a)2^{-k}\to0$, aucun n'admettant de subdivision $\delta$-fine.
+Soit $c$ le point commun $\bigcap_k[a_k,b_k]$. Pour $k$ assez grand,
+$[a_k,b_k]\subset(c-\delta(c),c+\delta(c))$ ; alors la subdivision pointée à une seule cellule
+$\{(c,[a_k,b_k])\}$ est $\delta$-fine --- contradiction.
+\end{proof}
+
+\begin{lemme}[« straddle »]\label{lem:straddle}
+Soit $F$ dérivable en $t$ et $\eps>0$. Il existe $\eta>0$ tel que, pour tout intervalle $[u,v]$ avec
+$u\le t\le v$ et $[u,v]\subset(t-\eta,t+\eta)$,
+\[
+\abs{F(v)-F(u)-F'(t)(v-u)}\le\eps(v-u).
+\]
+\end{lemme}
+
+\begin{proof}
+La dérivabilité en $t$ donne $\eta>0$ tel que $\abs{F(s)-F(t)-F'(t)(s-t)}\le\eps\abs{s-t}$ pour
+$\abs{s-t}<\eta$. Appliqué à $s=v$ puis $s=u$ et ajouté (avec $t-u\ge0$, $v-t\ge0$) :
+\[
+\abs{F(v)-F(u)-F'(t)(v-u)}\le\eps(v-t)+\eps(t-u)=\eps(v-u).\qedhere
+\]
+\end{proof}
+
+\begin{theoreme}[TFA de Henstock--Kurzweil]\label{thm:hk}
+Si $F:[a,b]\to\R$ est dérivable en \emph{tout} point, alors $F'$ est HK-intégrable et
+$\int_a^b F'=F(b)-F(a)$.
+\end{theoreme}
+
+\begin{proof}
+Soit $\eps>0$. Pour chaque $t\in[a,b]$, le lemme~\ref{lem:straddle} fournit $\eta_t>0$ ; posons
+$\delta(t)=\eta_t$, une jauge. Soit $P=\{(t_i,[x_{i-1},x_i])\}$ une subdivision pointée $\delta$-fine
+(elle existe par le lemme de Cousin~\ref{lem:cousin}). Comme $t_i\in[x_{i-1},x_i]\subset
+(t_i-\delta(t_i),t_i+\delta(t_i))$, le lemme~\ref{lem:straddle} donne
+$\abs{F(x_i)-F(x_{i-1})-F'(t_i)(x_i-x_{i-1})}\le\eps(x_i-x_{i-1})$. En sommant, et comme les
+$F(x_i)-F(x_{i-1})$ télescopent en $F(b)-F(a)$,
+\[
+\abs*{\sum_i F'(t_i)(x_i-x_{i-1})-\bigl(F(b)-F(a)\bigr)}
+\le\sum_i\eps(x_i-x_{i-1})=\eps(b-a).
+\]
+C'est exactement la définition : $F'$ est HK-intégrable, d'intégrale $F(b)-F(a)$.
+\end{proof}
+
+C'est la forme la plus aboutie du volet Newton--Leibniz : \emph{aucune} hypothèse d'intégrabilité,
+seule la dérivabilité en tout point. L'intégrale HK contient celle de Lebesgue (elles coïncident sur
+$L^1$), tout en intégrant des dérivées non absolument intégrables comme celle du
+contre-exemple~\ref{ce:hk}.
+
+% ============================================================
+\section{Synthèse}
+% ============================================================
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}>{\raggedright}p{5.0cm} >{\raggedright}p{4.3cm} c@{}}
+\toprule
+\textbf{Hypothèse sur $F$} & \textbf{Cadre} & $\int F'=\Delta F$ ? \\
+\midrule
+$F'$ continue & Riemann & \textbf{oui} \\
+$F$ absolument continue & Lebesgue & \textbf{oui} \\
+$F$ continue, $BV$ (Cantor) & Lebesgue & \textbf{non} \\
+$F$ dérivable partout, $F'\in L^1$ & Lebesgue & \textbf{oui} \\
+$F$ dérivable partout ($x^2\sin\frac1{x^2}$) & Lebesgue & \textbf{non} \\
+$F$ dérivable partout & Henstock--Kurzweil & \textbf{oui} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\noindent
+À chaque élargissement de l'intégrale (Riemann $\to$ Lebesgue $\to$ Henstock--Kurzweil) correspond un
+affaiblissement des hypothèses rendant le TFA valide ; et à chaque étape, un contre-exemple précis ---
+Volterra, l'escalier de Cantor, $x^2\sin(1/x^2)$ --- marque la frontière franchie et motive la
+suivante. La condition charnière, celle qui gouverne le volet Newton--Leibniz au sens de Lebesgue,
+est la \emph{continuité absolue}, exactement l'absence de partie singulière (continue ou de sauts) dans
+la mesure $d\mu_F=F'\,d\lambda+\cdots$ associée à $F$.
+
+\vspace{0.4cm}
+\hrule
+\vspace{0.3cm}
+\noindent\textbf{\color{NavyBlue}Repères bibliographiques.}\ \
+W.~Rudin, \emph{Real and Complex Analysis} (chap.~7) ;\ \
+G.~B.~Folland, \emph{Real Analysis} (chap.~3) ;\ \
+E.~M.~Stein \& R.~Shakarchi, \emph{Real Analysis} (chap.~3) ;\ \
+F.~Riesz \& B.~Sz.-Nagy, \emph{Le\c{c}ons d'analyse fonctionnelle} ;\ \
+R.~Gordon, \emph{The Integrals of Lebesgue, Denjoy, Perron, and Henstock}.
+
+\end{document}
